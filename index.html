@@ -9,6 +9,31 @@
     if(localStorage.getItem('fmr-admin') === '1'){ document.documentElement.classList.add('is-admin'); }
   }catch(e){}
 })();
+window.__fmrReady = Promise.race([
+  new Promise(function(resolve){ window.__fmrResolveReady = resolve; }),
+  new Promise(function(resolve){ setTimeout(function(){ resolve(null); }, 8000); })
+]);
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyD2cWGJkFhq_Zy34y5ttlQI1VYO7GvgUp8",
+    authDomain: "formynurseriri.firebaseapp.com",
+    projectId: "formynurseriri",
+    storageBucket: "formynurseriri.firebasestorage.app",
+    messagingSenderId: "80998371448",
+    appId: "1:80998371448:web:19aae077fe5574e9be5d8d",
+    measurementId: "G-JT3B2LQEC7"
+  };
+  try{
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.__fmrResolveReady({ db: db, doc: doc, getDoc: getDoc, setDoc: setDoc, onSnapshot: onSnapshot });
+  }catch(e){
+    console.error('Firebase init failed', e);
+    window.__fmrResolveReady(null);
+  }
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -685,10 +710,7 @@
             <div class="tag-row"><span class="tag-swatch" style="background:#5B6EF5"></span>inspirational notes</div>
           </div>
           <p class="jar-hint">tap the jar to pull a note 🌷 — one per color, per day</p>
-          <div style="display:flex; gap:14px; flex-wrap:wrap; justify-content:center;">
-            <button class="manage-link admin-only" id="manageNotesBtn" type="button">＋ manage jar notes</button>
-            <button class="manage-link" id="syncNotesBtn" type="button">🔄 got a sync code?</button>
-          </div>
+          <button class="manage-link admin-only" id="manageNotesBtn" type="button">＋ manage jar notes</button>
         </div>
       </div>
     </section>
@@ -728,22 +750,8 @@
           <h2 class="page-title" style="font-size:16px;">➕ add a new note</h2>
           <div id="manageAddRow"></div>
         </div>
-        <div style="margin-top:18px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-          <button class="btn ghost" id="copySyncCodeBtn" type="button">📋 copy sync code</button>
+        <div style="margin-top:18px; text-align:right;">
           <button class="btn" id="manageSaveBtn">Save category</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="jar-modal" id="syncModal">
-      <div class="jar-modal-inner">
-        <button class="jar-close" id="syncClose" aria-label="Close sync">✕</button>
-        <h3>sync from your person</h3>
-        <p class="lead" style="margin-top:0;">Paste the code your person sent you, then tap apply — it works for jar notes or messages, whichever code it is.</p>
-        <textarea id="syncCodeInput" rows="5" placeholder="Paste the sync code here..." style="font-family:monospace; font-size:12px;"></textarea>
-        <p id="syncStatus" style="min-height:1.3em; font-size:12.5px; font-weight:700; color:var(--mint-deep); margin:8px 0;"></p>
-        <div style="text-align:right;">
-          <button class="btn" id="applySyncCodeBtn" type="button">Apply code</button>
         </div>
       </div>
     </div>
@@ -779,8 +787,7 @@
           <div class="manage-row"><input type="text" id="newMsgSubject" placeholder="Subject (e.g. Happy Monthsary)"></div>
           <div class="manage-row"><textarea id="newMsgBody" rows="5" placeholder="Write your message..."></textarea></div>
         </div>
-        <div style="margin-top:18px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-          <button class="btn ghost" id="copyMsgSyncCodeBtn" type="button">📋 copy sync code</button>
+        <div style="margin-top:18px; text-align:right;">
           <button class="btn" id="manageMessagesSaveBtn">Save messages</button>
         </div>
       </div>
@@ -1121,21 +1128,48 @@ function rebuildFlatNotes(){
   CATEGORIES.forEach((cat,ci)=> cat.items.forEach((_,ii)=> FLAT_NOTES.push([ci,ii])));
 }
 async function loadCategories(){
-  let stored = await storeGet('riri-jar-items');
-  if(!stored){
+  const fmr = await window.__fmrReady;
+  if(!fmr){
+    CATEGORIES = CATEGORY_META.map(meta => ({ ...meta, items: DEFAULT_ITEMS[meta.key] || [] }));
+    rebuildFlatNotes();
+    return;
+  }
+  const ref = fmr.doc(fmr.db, 'jarData', 'items');
+  let stored = null;
+  try{
+    const snap = await fmr.getDoc(ref);
+    if(snap.exists()){ stored = snap.data(); }
+    else{
+      stored = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+      await fmr.setDoc(ref, stored);
+    }
+  }catch(e){
+    console.error('jar load failed, using local defaults', e);
     stored = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
-    await storeSet('riri-jar-items', stored);
   }
   CATEGORIES = CATEGORY_META.map(meta => ({ ...meta, items: stored[meta.key] || [] }));
   rebuildFlatNotes();
+  try{
+    fmr.onSnapshot(ref, function(snap){
+      if(!snap.exists()) return;
+      const data = snap.data();
+      CATEGORIES = CATEGORY_META.map(meta => ({ ...meta, items: data[meta.key] || [] }));
+      rebuildFlatNotes();
+      renderJarInside();
+    });
+  }catch(e){ console.error(e); }
 }
 async function saveCategoryItems(catKey, items){
-  const stored = (await storeGet('riri-jar-items')) || {};
-  stored[catKey] = items;
-  await storeSet('riri-jar-items', stored);
   const cat = CATEGORIES.find(c=>c.key===catKey);
   if(cat) cat.items = items;
   rebuildFlatNotes();
+  const fmr = await window.__fmrReady;
+  if(!fmr) return;
+  const ref = fmr.doc(fmr.db, 'jarData', 'items');
+  const full = {};
+  CATEGORIES.forEach(function(c){ full[c.key] = c.items; });
+  try{ await fmr.setDoc(ref, full); }
+  catch(e){ console.error('jar save failed', e); }
 }
 
 function todayStr(){ return new Date().toDateString(); }
@@ -1358,92 +1392,6 @@ document.getElementById('manageSaveBtn').addEventListener('click', async ()=>{
   renderJarInside();
 });
 
-/* ---------------- SYNC CODE (export / import jar items) ---------------- */
-function b64EncodeUtf8(str){ return btoa(unescape(encodeURIComponent(str))); }
-function b64DecodeUtf8(str){ return decodeURIComponent(escape(atob(str))); }
-
-document.getElementById('copySyncCodeBtn').addEventListener('click', async ()=>{
-  const stored = (await storeGet('riri-jar-items')) || {};
-  const code = 'RIRIJAR1:' + b64EncodeUtf8(JSON.stringify(stored));
-  const btn = document.getElementById('copySyncCodeBtn');
-  function done(ok){
-    btn.textContent = ok ? '✓ copied — now send it to her' : 'copy failed — select & copy manually';
-    setTimeout(()=>{ btn.textContent = '📋 copy sync code'; }, 2400);
-  }
-  try{
-    await navigator.clipboard.writeText(code);
-    done(true);
-  }catch(e){
-    try{
-      const ta = document.createElement('textarea');
-      ta.value = code; ta.style.position='fixed'; ta.style.opacity='0';
-      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-      done(true);
-    }catch(e2){ done(false); }
-  }
-});
-
-document.getElementById('syncNotesBtn').addEventListener('click', ()=>{
-  document.getElementById('syncStatus').textContent = '';
-  document.getElementById('syncCodeInput').value = '';
-  document.getElementById('syncModal').classList.add('open');
-});
-document.getElementById('syncClose').addEventListener('click', ()=>{
-  document.getElementById('syncModal').classList.remove('open');
-});
-document.getElementById('syncModal').addEventListener('click', e=>{
-  if(e.target.id==='syncModal') document.getElementById('syncModal').classList.remove('open');
-});
-document.getElementById('applySyncCodeBtn').addEventListener('click', async ()=>{
-  const status = document.getElementById('syncStatus');
-  const raw = document.getElementById('syncCodeInput').value.trim();
-
-  if(raw.startsWith('RIRIJAR1:')){
-    try{
-      const parsed = JSON.parse(b64DecodeUtf8(raw.slice('RIRIJAR1:'.length)));
-      const validKeys = CATEGORY_META.map(m=>m.key);
-      const cleaned = {};
-      validKeys.forEach(k=>{ if(Array.isArray(parsed[k])) cleaned[k] = parsed[k]; });
-      if(Object.keys(cleaned).length===0){ throw new Error('empty'); }
-      await storeSet('riri-jar-items', { ...(await storeGet('riri-jar-items') || {}), ...cleaned });
-      await loadCategories();
-      renderJarInside();
-      status.style.color = 'var(--mint-deep)';
-      status.textContent = "Synced! Your jar is up to date. 💗";
-      setTimeout(()=>{ document.getElementById('syncModal').classList.remove('open'); }, 1200);
-    }catch(e){
-      status.style.color = 'var(--pink-deep)';
-      status.textContent = "Couldn't read that code — ask for a fresh one.";
-    }
-    return;
-  }
-
-  if(raw.startsWith('RIRIMSG1:')){
-    try{
-      const incoming = JSON.parse(b64DecodeUtf8(raw.slice('RIRIMSG1:'.length)));
-      if(!Array.isArray(incoming)) throw new Error('bad shape');
-      const localById = {};
-      MESSAGES.forEach(m=> localById[m.id]=m);
-      const merged = incoming.map(m=>({
-        ...m,
-        read: localById[m.id] ? localById[m.id].read : false
-      }));
-      await saveMessages(merged);
-      renderMessagesList();
-      status.style.color = 'var(--mint-deep)';
-      status.textContent = "Synced! New messages are waiting. 💌";
-      setTimeout(()=>{ document.getElementById('syncModal').classList.remove('open'); }, 1200);
-    }catch(e){
-      status.style.color = 'var(--pink-deep)';
-      status.textContent = "Couldn't read that code — ask for a fresh one.";
-    }
-    return;
-  }
-
-  status.style.color = 'var(--pink-deep)';
-  status.textContent = "That doesn't look like a sync code — check you copied the whole thing.";
-});
-
 (async function initJar(){
   await loadCategories();
   await loadOpenedToday();
@@ -1456,27 +1404,62 @@ const DEFAULT_MESSAGES = [
     id: 'seed-monthsary',
     subject: '🎉 Happy Monthsary',
     date: new Date().toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'}),
-    body: "My Wife,\n\nHappy Monthsary! Another month passed, all the laughters and tears we shed. The easy and busy days we had.\n\nAlways remember that, you will always be the person who I would randomly think of in my busiest time. You will always be the person I run to whenever I want someone to talk to. You will always be that person, I love every tick of the clock. You will always be in every beat of my heart. I will always appreciate all the kind words, the silly jokes you pull, it keeps me going my love. You will always be my kindest and good girl. I will always support you no matter what track you go, what career you pursue and what passion you play. You will always always have me, from behind and from your side holding your hands. I will always raise you, flex you and make sure you're in the stand, hoping you will not see me less. I hope you will see me as your partner on every step and phase of our life. I'm sure of you, and I'm sure of our relationship and the future that this will bring. I hope that no matter the situation is we will always choose each other and stay together. We will choose to lower down our pride and ego, we choose to understand every perspective of each other and we choose to calm down and communicate during the fight and misunderstanding. I wanna see us together in the future and moving forward.\n\nI will always love you with all my heart, Ri.",
-    read: false
+    body: "My Wife,\n\nHappy Monthsary! Another month passed, all the laughters and tears we shed. The easy and busy days we had.\n\nAlways remember that, you will always be the person who I would randomly think of in my busiest time. You will always be the person I run to whenever I want someone to talk to. You will always be that person, I love every tick of the clock. You will always be in every beat of my heart. I will always appreciate all the kind words, the silly jokes you pull, it keeps me going my love. You will always be my kindest and good girl. I will always support you no matter what track you go, what career you pursue and what passion you play. You will always always have me, from behind and from your side holding your hands. I will always raise you, flex you and make sure you're in the stand, hoping you will not see me less. I hope you will see me as your partner on every step and phase of our life. I'm sure of you, and I'm sure of our relationship and the future that this will bring. I hope that no matter the situation is we will always choose each other and stay together. We will choose to lower down our pride and ego, we choose to understand every perspective of each other and we choose to calm down and communicate during the fight and misunderstanding. I wanna see us together in the future and moving forward.\n\nI will always love you with all my heart, Ri."
   }
 ];
 let MESSAGES = [];
+let readIds = new Set();
+
+async function loadReadIds(){
+  const arr = (await storeGet('riri-messages-read-ids')) || [];
+  readIds = new Set(arr);
+}
+async function markMessageRead(id){
+  if(readIds.has(id)) return;
+  readIds.add(id);
+  await storeSet('riri-messages-read-ids', Array.from(readIds));
+}
+function isMessageRead(id){ return readIds.has(id); }
 
 async function loadMessages(){
-  let stored = await storeGet('riri-messages');
-  if(!stored){
+  const fmr = await window.__fmrReady;
+  if(!fmr){
+    MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
+    return;
+  }
+  const ref = fmr.doc(fmr.db, 'jarData', 'messages');
+  let stored = null;
+  try{
+    const snap = await fmr.getDoc(ref);
+    if(snap.exists()){ stored = snap.data().list || []; }
+    else{
+      stored = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
+      await fmr.setDoc(ref, { list: stored });
+    }
+  }catch(e){
+    console.error('messages load failed, using local defaults', e);
     stored = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
-    await storeSet('riri-messages', stored);
   }
   MESSAGES = stored;
+  try{
+    fmr.onSnapshot(ref, function(snap){
+      if(!snap.exists()) return;
+      MESSAGES = snap.data().list || [];
+      renderMessagesList();
+    });
+  }catch(e){ console.error(e); }
 }
 async function saveMessages(list){
   MESSAGES = list;
-  await storeSet('riri-messages', list);
+  const fmr = await window.__fmrReady;
+  if(!fmr) return;
+  const ref = fmr.doc(fmr.db, 'jarData', 'messages');
+  try{ await fmr.setDoc(ref, { list: list }); }
+  catch(e){ console.error('messages save failed', e); }
 }
 function updateMsgBadge(){
   const badge = document.getElementById('msgBadge');
-  const unread = MESSAGES.filter(m=>!m.read).length;
+  const unread = MESSAGES.filter(m=>!isMessageRead(m.id)).length;
   if(unread>0){ badge.hidden=false; badge.textContent = unread; }
   else { badge.hidden=true; }
 }
@@ -1491,7 +1474,7 @@ function renderMessagesList(){
   wrap.innerHTML = '<div class="messages-grid">' + sorted.map(m=>`
     <div class="envelope" data-id="${escapeAttr(m.id)}" tabindex="0" role="button" aria-label="Open message: ${escapeAttr(m.subject)}">
       <div class="envelope-flap"></div>
-      ${!m.read ? '<span class="envelope-new">new</span>' : ''}
+      ${!isMessageRead(m.id) ? '<span class="envelope-new">new</span>' : ''}
       <div class="envelope-seal">💗</div>
       <p class="envelope-subject">${escapeHtml(m.subject)}</p>
       <p class="envelope-date">${escapeHtml(m.date)}</p>
@@ -1511,9 +1494,8 @@ async function openMessage(id){
   document.getElementById('msgReadDate').textContent = msg.date;
   document.getElementById('msgReadBody').innerHTML = msg.body.split('\n\n').map(p=>`<p>${escapeHtml(p)}</p>`).join('');
   document.getElementById('messageReadModal').classList.add('open');
-  if(!msg.read){
-    msg.read = true;
-    await saveMessages(MESSAGES);
+  if(!isMessageRead(id)){
+    await markMessageRead(id);
     renderMessagesList();
   }
 }
@@ -1559,8 +1541,7 @@ document.getElementById('manageMessagesSaveBtn').addEventListener('click', async
       id,
       subject: r.querySelector('.m-subject').value.trim() || 'A message',
       body: r.querySelector('.m-body').value.trim(),
-      date: existing ? existing.date : new Date().toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'}),
-      read: existing ? existing.read : false
+      date: existing ? existing.date : new Date().toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'})
     };
   }).filter(m=>m.body);
   const newSubject = document.getElementById('newMsgSubject').value.trim();
@@ -1570,8 +1551,7 @@ document.getElementById('manageMessagesSaveBtn').addEventListener('click', async
       id: 'm'+Date.now().toString()+Math.random().toString(36).slice(2,7),
       subject: newSubject || 'A message for you',
       body: newBody,
-      date: new Date().toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'}),
-      read: false
+      date: new Date().toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'})
     });
   }
   await saveMessages(updated);
@@ -1580,27 +1560,9 @@ document.getElementById('manageMessagesSaveBtn').addEventListener('click', async
   renderManageMessagesList();
   renderMessagesList();
 });
-document.getElementById('copyMsgSyncCodeBtn').addEventListener('click', async ()=>{
-  const code = 'RIRIMSG1:' + b64EncodeUtf8(JSON.stringify(MESSAGES));
-  const btn = document.getElementById('copyMsgSyncCodeBtn');
-  function done(ok){
-    btn.textContent = ok ? '✓ copied — now send it to her' : 'copy failed — select & copy manually';
-    setTimeout(()=>{ btn.textContent = '📋 copy sync code'; }, 2400);
-  }
-  try{
-    await navigator.clipboard.writeText(code);
-    done(true);
-  }catch(e){
-    try{
-      const ta = document.createElement('textarea');
-      ta.value = code; ta.style.position='fixed'; ta.style.opacity='0';
-      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-      done(true);
-    }catch(e2){ done(false); }
-  }
-});
 
 (async function initMessages(){
+  await loadReadIds();
   await loadMessages();
   renderMessagesList();
 })();
