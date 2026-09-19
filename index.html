@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FF6B8B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="My Riri">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23FFB7C5'/%3E%3Ctext x='50' y='66' font-size='55' text-anchor='middle'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
+<title>For My Riri 🌸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Merienda:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFF0F5;
+    --bg-deep:#FDE8ED;
+    --card:#FFFFFF;
+    --glass: rgba(255,255,255,.85);
+    --pink-soft:#FFB7C5;
+    --pink:#FF6B8B;
+    --pink-deep:#E05370;
+    --mint:#A8E6CF;
+    --mint-deep:#4FA37E;
+    --lavender:#E8DFF5;
+    --ink:#3D1A24;
+    --ink-soft:#7A3B4D;
+    --gold:#FFD166;
+    --border-pink:#FFC0CB;
+    --shadow-soft: 0 10px 30px -5px rgba(255,107,139,.18), 0 4px 12px rgba(0,0,0,.05);
+    --shadow-3d: 0 6px 0 var(--pink-deep), 0 14px 28px rgba(255,107,139,.25);
+    --shadow-mint: 0 6px 0 var(--mint-deep), 0 14px 28px rgba(79,163,126,.25);
+    --radius-lg: 28px;
+    --radius-md: 20px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    font-family:'Nunito',sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 12% 8%, #FFE3EE 0%, transparent 45%),
+      radial-gradient(circle at 90% 15%, var(--lavender) 0%, transparent 40%),
+      radial-gradient(circle at 85% 90%, var(--mint) 0%, transparent 38%),
+      var(--bg);
+    overflow-x:hidden;
+    position:relative;
+  }
+  ::selection{ background:var(--pink-soft); }
+  ::-webkit-scrollbar{ width:10px; }
+  ::-webkit-scrollbar-track{ background:var(--bg-deep); }
+  ::-webkit-scrollbar-thumb{ background:var(--pink); border-radius:10px; border:2px solid var(--bg-deep); }
+
+  /* floating decorations */
+  #deco{position:fixed; inset:0; pointer-events:none; z-index:0; perspective:900px; overflow:hidden;}
+  .float-item{
+    position:absolute; font-size:28px; opacity:.5;
+    filter: drop-shadow(0 6px 10px rgba(224,83,112,.15));
+    will-change:transform;
+  }
+  .wrap{
+    position:relative; z-index:2;
+    max-width:1000px; margin:0 auto;
+    padding: calc(28px + env(safe-area-inset-top)) 18px calc(120px + env(safe-area-inset-bottom));
+  }
+  header.hero{ text-align:center; padding: 20px 20px 6px; }
+  .eyebrow-heart{ display:inline-block; font-size:34px; margin-bottom:6px; animation: pulse 2.6s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.12);} }
+  h1.title{
+    font-family:'Fredoka',sans-serif;
+    font-weight:600;
+    font-size: clamp(28px, 6vw, 46px);
+    margin: 4px 0 8px;
+    color: #4A1525;
+    text-shadow: 0 2px 0 #fff, 0 4px 10px rgba(224,83,112,.2);
+  }
+  .subtitle{ color: var(--ink-soft); font-size:16px; max-width:520px; margin: 0 auto; line-height:1.5; font-weight:600; }
+  .streak-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    background:#fff; border:2px solid var(--gold); color:#9A6B00;
+    font-family:'Fredoka',sans-serif; font-weight:600; font-size:13px;
+    padding:6px 14px; border-radius:999px; margin-top:14px;
+    box-shadow: 0 3px 0 #F2C14E;
+  }
+
+  nav.dock{ display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin: 24px 0 6px; }
+  .nav-btn{
+    font-family:'Fredoka',sans-serif; font-weight:600; font-size:14.5px;
+    color:var(--pink-deep); background: var(--card); border:none; border-radius:16px;
+    padding: 12px 18px; display:flex; align-items:center; gap:8px; cursor:pointer;
+    box-shadow: var(--shadow-3d); transform: translateY(0);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .nav-btn .ic{font-size:19px;}
+  .nav-btn:hover{ transform: translateY(-3px); }
+  .nav-btn:active, .nav-btn.active{ transform: translateY(4px); box-shadow: 0 2px 0 var(--pink-deep), 0 4px 8px rgba(255,107,139,.28); }
+  .nav-btn.active{ background: var(--pink); color:#fff; }
+  .nav-badge{
+    display:inline-block; min-width:16px; height:16px; padding:0 3px; margin-left:4px;
+    background:var(--gold); color:#4A2E00; border-radius:8px; font-size:10px; font-weight:800;
+    line-height:16px; text-align:center;
+  }
+
+  main{ position:relative; min-height:420px; perspective:1200px; }
+  .page{ display:none; animation: settle .5s cubic-bezier(.2,.9,.25,1); }
+  .page.active{ display:block; }
+  @keyframes settle{ from{ opacity:0; transform: rotateX(8deg) translateY(18px);} to{ opacity:1; transform: rotateX(0) translateY(0);} }
+
+  .card{
+    background:var(--card); border-radius: var(--radius-lg); padding: 28px;
+    box-shadow: var(--shadow-soft); border: 2px solid var(--border-pink);
+  }
+  .card + .card{ margin-top:18px; }
+  h2.page-title{ font-family:'Fredoka',sans-serif; color:var(--pink-deep); font-size:23px; margin:0 0 14px; display:flex; align-items:center; gap:10px; }
+  p.lead{ color:var(--ink-soft); margin-top:-6px; margin-bottom:18px; line-height:1.6; font-weight:600;}
+
+  .btn{
+    font-family:'Fredoka',sans-serif; font-weight:600; font-size:14px;
+    border:none; border-radius:14px; padding: 11px 18px; cursor:pointer;
+    color:#fff; background:var(--pink); box-shadow: 0 4px 0 var(--pink-deep);
+    transition: transform .1s ease, box-shadow .1s ease;
+  }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn:active{ transform: translateY(3px); box-shadow: 0 1px 0 var(--pink-deep); }
+  .btn.mint{ background:var(--mint-deep); box-shadow: 0 4px 0 #3E8267; }
+  .btn.ghost{ background:#fff; color:var(--pink-deep); box-shadow: 0 3px 0 var(--pink-soft); border:2px solid var(--pink-soft); }
+  .btn.small{ padding:7px 12px; font-size:12.5px; border-radius:10px;}
+
+  /* ---------- HOME / INSPIRATION ---------- */
+  .letter-wrap{ position:relative; margin-bottom:20px; }
+  .letter-folded{
+    background: linear-gradient(160deg,#FFF6F9,#FDE8ED); border:2px dashed var(--pink);
+    border-radius: var(--radius-md); padding:38px 20px; text-align:center; cursor:pointer;
+    transition: transform .5s cubic-bezier(.3,1.2,.4,1), opacity .4s ease;
+    position:relative; overflow:hidden;
+  }
+  .letter-folded:focus-visible{ outline:3px solid var(--pink); outline-offset:3px; }
+  .letter-folded .fold-line{ position:absolute; left:8%; right:8%; height:1px; background:rgba(224,83,112,.3); }
+  .letter-folded .fold-line.l1{ top:33%; }
+  .letter-folded .fold-line.l2{ top:66%; }
+  .letter-seal{
+    width:46px; height:46px; margin:0 auto 10px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #FF9FB6, var(--pink-deep) 75%);
+    display:flex; align-items:center; justify-content:center; font-size:19px; color:#fff;
+    box-shadow: 0 4px 8px rgba(224,83,112,.3);
+  }
+  .letter-hint{ margin:0; font-size:12.5px; color:var(--ink-soft); font-weight:800; }
+  .letter-wrap.open .letter-folded{ transform: scaleY(.15); opacity:0; pointer-events:none; position:absolute; inset:0; }
+  .letter-open{
+    display:none; background: linear-gradient(160deg,#fff,#FFF0F5); border:2px solid var(--pink-soft);
+    border-radius: var(--radius-md); padding:26px 22px; font-family:'Merienda',cursive; font-weight:600; font-size:15.5px;
+    color:var(--ink); line-height:1.75; box-shadow: 0 10px 22px rgba(224,83,112,.15);
+    transform-origin: top center;
+  }
+  .letter-wrap.open .letter-open{ display:block; animation: unfoldIn .55s cubic-bezier(.2,.9,.25,1); }
+  @keyframes unfoldIn{ from{ opacity:0; transform: scaleY(.25); } to{ opacity:1; transform: scaleY(1); } }
+  .letter-salutation{ font-size:18px; font-weight:800; color:var(--pink-deep); margin-top:0; }
+  .letter-sign{ margin-bottom:6px; color:var(--pink-deep); font-weight:800; }
+  @media (prefers-reduced-motion: reduce){
+    .letter-open{ animation:none !important; }
+    .letter-folded{ transition:none !important; }
+  }
+  .center{ text-align:center; }
+
+  /* ---------- MESSAGES ---------- */
+  .messages-grid{ display:grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap:16px 14px; margin-top:6px; }
+  .envelope{
+    position:relative; background: linear-gradient(160deg,#FFF6F9,#FDE8ED);
+    border:2px solid var(--pink-soft); border-radius:10px; padding:26px 12px 14px;
+    cursor:pointer; text-align:center; overflow:hidden;
+    transition: transform .15s ease, box-shadow .15s ease;
+    box-shadow: 0 4px 10px rgba(224,83,112,.12);
+  }
+  .envelope:hover{ transform: translateY(-3px); box-shadow: 0 8px 16px rgba(224,83,112,.2); }
+  .envelope:focus-visible{ outline:3px solid var(--pink); outline-offset:3px; }
+  .envelope-flap{
+    position:absolute; top:0; left:0; right:0; height:40%;
+    background: linear-gradient(160deg,#FFE1E9,#FFC6D3);
+    clip-path: polygon(0 0, 50% 82%, 100% 0);
+  }
+  .envelope-seal{
+    position:relative; width:26px; height:26px; margin:6px auto 8px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #FF9FB6, var(--pink-deep) 75%);
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:#fff;
+    box-shadow: 0 3px 6px rgba(224,83,112,.3);
+  }
+  .envelope-subject{ position:relative; margin:0; font-family:'Fredoka',sans-serif; font-weight:600; font-size:13px; color:var(--ink); line-height:1.3; }
+  .envelope-date{ position:relative; margin:4px 0 0; font-size:10.5px; color:var(--ink-soft); font-weight:700; }
+  .envelope-new{
+    position:absolute; top:6px; right:6px; background:var(--gold); color:#4A2E00; font-size:9px; font-weight:800;
+    padding:2px 7px; border-radius:8px; letter-spacing:.03em;
+  }
+
+  /* ---------- NOTES JAR ---------- */
+  .jar-section{ display:flex; flex-direction:column; align-items:center; gap:14px; padding: 8px 0 4px; }
+  .jar{
+    position:relative; width:176px; height:216px; cursor:pointer; user-select:none;
+    transform-origin:bottom center; transition: transform .35s cubic-bezier(.3,1.6,.4,1);
+  }
+  .jar:hover{ transform: rotate(-2deg) translateY(-2px); }
+  .jar:focus-visible{ outline:3px solid var(--pink); outline-offset:4px; border-radius:14px; }
+  .jar.opening{ animation: jar-jiggle .55s ease; }
+  @keyframes jar-jiggle{
+    0%,100%{ transform: rotate(0); }
+    20%{ transform: rotate(-6deg) scale(1.03); }
+    40%{ transform: rotate(5deg) scale(1.05); }
+    60%{ transform: rotate(-4deg) scale(1.04); }
+    80%{ transform: rotate(2deg) scale(1.02); }
+  }
+  .jar-lid-wrap{ position:relative; z-index:4; transition: transform .5s cubic-bezier(.3,1.4,.4,1); }
+  .jar.opening .jar-lid-wrap{ transform: translateY(-14px) rotate(-18deg); }
+  .jar-lid{
+    width:118px; height:22px; margin:0 auto; border-radius:5px; position:relative;
+    background: repeating-linear-gradient(90deg, #CDD1D6 0 4px, #EEF0F2 4px 7px, #C3C7CC 7px 8px);
+    box-shadow: 0 2px 0 rgba(0,0,0,.12), inset 0 -3px 4px rgba(0,0,0,.15), inset 0 2px 2px rgba(255,255,255,.6);
+  }
+  .jar-lid::before{
+    content:""; position:absolute; left:-3px; right:-3px; bottom:-7px; height:11px;
+    background: linear-gradient(180deg,#EA5468,#C22E42); border-radius:2px;
+    box-shadow:0 2px 3px rgba(74,21,37,.2);
+  }
+  .jar-bow{ position:absolute; right:-4px; top:-15px; width:36px; height:24px; z-index:5; }
+  .jar-bow .loop{
+    position:absolute; top:3px; width:16px; height:16px; border-radius:50% 50% 50% 2px;
+    background: radial-gradient(circle at 32% 32%, #FFE9EF, #E8455B 78%);
+    box-shadow:0 1px 3px rgba(74,21,37,.25);
+  }
+  .jar-bow .loop.left{ left:1px; transform:rotate(-50deg); }
+  .jar-bow .loop.right{ right:1px; transform:rotate(50deg) scaleX(-1); }
+  .jar-bow .knot{
+    position:absolute; left:50%; top:7px; transform:translateX(-50%);
+    width:9px; height:9px; border-radius:50%; background:#C22E42; z-index:2;
+    box-shadow:0 1px 2px rgba(74,21,37,.3);
+  }
+  .jar-body{
+    width:170px; height:188px; margin:-4px auto 0; position:relative; overflow:hidden;
+    background:
+      radial-gradient(circle at 32% 18%, rgba(255,244,214,.6), rgba(255,255,255,.08) 55%),
+      linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.04));
+    border:2px solid rgba(255,255,255,.6);
+    border-radius: 50% 50% 46% 46% / 60% 60% 40% 40%;
+    box-shadow: inset 0 0 26px rgba(255,255,255,.45), inset 0 -14px 22px rgba(194,46,66,.08), 0 14px 24px rgba(74,21,37,.2);
+  }
+  .jar-shine{
+    position:absolute; top:16px; left:22px; width:14px; height:68%;
+    background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,0));
+    border-radius:10px; transform: rotate(6deg);
+  }
+  .jar-shine.two{
+    top:22px; left:auto; right:28px; width:7px; height:50%; opacity:.5; transform:rotate(-5deg);
+  }
+  .mini-note{
+    position:absolute; width:19px; height:14px; border-radius:2px 2px 2px 6px;
+    box-shadow: 0 2px 3px rgba(74,21,37,.2), inset 0 0 0 1px rgba(255,255,255,.3);
+    animation: mini-bob 3.4s ease-in-out infinite;
+  }
+  @keyframes mini-bob{ 0%,100%{ transform: translateY(0) rotate(var(--rot,0deg)); } 50%{ transform: translateY(-3px) rotate(var(--rot,0deg)); } }
+  .jar-tag{
+    background:#fff; border:1px solid rgba(74,21,37,.08); border-radius:4px;
+    padding:14px 18px; max-width:260px; text-align:left; box-shadow:0 8px 18px rgba(74,21,37,.16);
+    transform:rotate(-1deg);
+  }
+  .tag-row{ display:flex; align-items:center; gap:10px; font-family:'Merienda',cursive; font-weight:600; font-size:13.5px; color:var(--ink); padding:3px 0; }
+  .tag-swatch{ width:15px; height:15px; border-radius:3px; flex:none; box-shadow:0 1px 2px rgba(0,0,0,.18); }
+  .jar-hint{ font-size:12.5px; color:var(--ink-soft); font-weight:700; margin:0; }
+  .manage-link{
+    background:none; border:none; color:var(--ink-soft); font-weight:700; font-size:11.5px;
+    text-decoration:underline; cursor:pointer; padding:2px; margin-top:2px; opacity:.7;
+  }
+  .manage-link:hover{ opacity:1; color:var(--pink-deep); }
+
+  .jar-modal{
+    display:none; position:fixed; inset:0; z-index:50; background:rgba(74,21,37,.42);
+    align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(2px);
+  }
+  .jar-modal.open{ display:flex; }
+  .jar-modal-inner{
+    background:var(--bg); border-radius: var(--radius-lg); padding:26px 22px; max-width:520px; width:100%;
+    max-height:82vh; overflow-y:auto; position:relative; box-shadow: 0 24px 60px rgba(74,21,37,.35);
+    border:3px solid #fff;
+  }
+  .jar-close{
+    position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:50%;
+    border:none; background:#fff; color:var(--pink-deep); font-size:16px; font-weight:800; cursor:pointer;
+    box-shadow: 0 3px 0 var(--pink-soft);
+  }
+  .jar-modal-inner h3{ font-family:'Fredoka',sans-serif; color:var(--pink-deep); margin: 0 20px 16px 0; font-size:19px; }
+  .notes-scatter{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; padding:6px 0 4px; }
+  .scatter-note{
+    width:78px; min-height:78px; border-radius:4px 4px 4px 14px; padding:10px 8px;
+    font-size:11px; line-height:1.35; color:var(--ink); font-weight:700; cursor:pointer;
+    box-shadow: 0 4px 8px rgba(74,21,37,.14); transform: rotate(var(--rot,0deg));
+    transition: transform .15s ease; display:flex; align-items:center; text-align:center;
+  }
+  .scatter-note:hover{ transform: rotate(0deg) scale(1.08); }
+  .scatter-note.mystery{ font-size:24px; justify-content:center; }
+  .scatter-note.locked{
+    width:104px; cursor:default; color:var(--ink-soft); font-weight:700; font-size:10.5px;
+    border:2px dashed rgba(74,21,37,.15); box-shadow:none;
+  }
+  .scatter-note.locked:hover{ transform: rotate(var(--rot,0deg)); }
+  #pullAnotherBtn:disabled{ opacity:.55; cursor:default; box-shadow:none; transform:none; }
+  .manage-row{ display:flex; gap:8px; align-items:flex-start; margin-bottom:10px; }
+  .manage-row textarea, .manage-row input{ flex:1; }
+  .manage-row .del-row{
+    flex:none; background:#FFE1E9; border:2px solid var(--pink-deep); color:var(--pink-deep);
+    border-radius:10px; width:36px; height:36px; cursor:pointer; font-size:13px; font-weight:800;
+  }
+  .note-reveal{ display:none; text-align:center; padding: 6px 6px 4px; }
+  .note-reveal.show{ display:block; }
+  .note-reveal .card-face{
+    background: linear-gradient(160deg,#fff,#FFE9F3); border:2px solid var(--pink-soft); border-radius:20px;
+    padding:26px 20px; font-family:'Merienda',cursive; font-weight:600; font-size:17px; color:var(--ink);
+    box-shadow: 0 10px 22px rgba(224,83,112,.18); margin-bottom:16px; line-height:1.6;
+  }
+  .note-reveal .reveal-tag{ color:var(--mint-deep); font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; display:block; margin-top:10px; }
+  .song-face{
+    background: linear-gradient(160deg,#fff,#FFF6DE); border:2px solid var(--gold); border-radius:20px;
+    padding:26px 22px; box-shadow: 0 10px 22px rgba(224,83,112,.14); margin-bottom:16px; text-align:center;
+  }
+  .song-art{
+    width:72px; height:72px; margin:0 auto 14px; border-radius:16px;
+    background: linear-gradient(160deg,#FFD166,#FF9FBD); display:flex; align-items:center; justify-content:center;
+    font-size:30px; color:#fff; box-shadow: 0 6px 14px rgba(224,83,112,.25);
+  }
+  .song-title{ font-family:'Fredoka',sans-serif; font-weight:600; font-size:18px; color:var(--ink); }
+  .song-artist{ font-size:13.5px; color:var(--ink-soft); font-weight:700; margin-top:2px; margin-bottom:18px; min-height:1em; }
+  .song-listen-btn{
+    display:inline-flex; align-items:center; gap:8px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:14px;
+    color:#fff; background:var(--pink); padding:11px 20px; border-radius:14px; text-decoration:none;
+    box-shadow: 0 4px 0 var(--pink-deep);
+  }
+  .song-note{ font-size:11px; color:var(--ink-soft); margin:14px 0 0; font-style:italic; }
+  .reveal-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+  /* ---------- JOURNAL ---------- */
+  textarea, input[type=text]{
+    font-family:'Nunito',sans-serif; width:100%; border-radius:14px; border:2px solid var(--pink-soft);
+    padding:12px 14px; font-size:14.5px; color:var(--ink); background:#FFFBFD; resize:vertical;
+  }
+  textarea:focus, input[type=text]:focus{ outline:2px solid var(--pink); border-color:var(--pink);}
+  .mood-row{ display:flex; gap:8px; margin: 10px 0 14px; flex-wrap:wrap;}
+  .mood-chip{ border:2px solid var(--pink-soft); background:#fff; border-radius:12px; padding:7px 12px; cursor:pointer; font-size:14px; font-weight:700;}
+  .mood-chip.selected{ background:var(--pink-soft); border-color:var(--pink);}
+  .entry{ background:#FFFBFD; border-left:5px solid var(--pink); border-radius:12px; padding:14px 16px; margin-bottom:10px; }
+  .entry-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+  .entry-date{ font-size:12.5px; color:var(--ink-soft); font-weight:800;}
+  .entry-mood{ font-size:18px; }
+  .entry-del{
+    background:none; border:none; font-size:13px; cursor:pointer; opacity:.45; padding:2px 4px; border-radius:6px;
+  }
+  .entry-del:hover{ opacity:1; background:#FFE1E9; }
+  .entry-text{ font-size:14.5px; line-height:1.55; white-space:pre-wrap;}
+  .empty{ color:var(--ink-soft); font-style:italic; text-align:center; padding:18px 0;}
+
+  /* ---------- FLASHCARDS ---------- */
+  .fc-controls{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:18px;}
+  .chip{ border-radius:12px; padding:8px 14px; font-size:13.5px; font-weight:700; cursor:pointer; border:2px solid var(--pink-soft); background:#fff; color:var(--ink-soft); }
+  .chip.selected{ background:var(--pink); color:#fff; border-color:var(--pink);}
+  .fc-stage{ display:flex; flex-direction:column; align-items:center; gap:14px;}
+  .flip-card{ width:min(420px,90%); height:230px; perspective:1200px; cursor:pointer; }
+  .flip-inner{ position:relative; width:100%; height:100%; transform-style:preserve-3d; transition: transform .6s cubic-bezier(.2,.9,.25,1); }
+  .flip-card.flipped .flip-inner{ transform: rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; backface-visibility:hidden; border-radius: var(--radius-lg);
+    display:flex; align-items:center; justify-content:center; text-align:center; padding:24px;
+    font-family:'Fredoka',sans-serif; font-weight:600; font-size:19px; box-shadow: 0 14px 30px rgba(224,83,112,.22);
+  }
+  .flip-front{ background: linear-gradient(160deg,#fff,#FFE9F3); color:var(--pink-deep); border:2px solid var(--pink-soft);}
+  .flip-back{ background: linear-gradient(160deg,var(--pink),var(--pink-deep)); color:#fff; transform: rotateY(180deg); }
+  .ribbon{
+    position:absolute; top:12px; left:-6px; font-size:10.5px; font-weight:800; letter-spacing:.02em;
+    background:var(--gold); color:#4A2E00; padding:4px 12px 4px 14px; border-radius:0 6px 6px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,.15);
+  }
+  .ribbon::before{ content:""; position:absolute; left:0; top:100%; border-width:5px 6px 0 0; border-style:solid; border-color:#B8860B transparent transparent transparent; }
+  .ribbon.on-back{ background:#fff; color:var(--pink-deep); }
+  .mastery-badge{
+    position:absolute; top:12px; right:16px; font-size:16px;
+  }
+  .rate-row{ display:flex; gap:8px; justify-content:center; }
+  .rate-btn{
+    border:2px solid var(--pink-soft); background:#fff; border-radius:12px; padding:8px 12px;
+    font-size:12.5px; font-weight:700; cursor:pointer; color:var(--ink-soft);
+  }
+  .rate-btn.easy.active{ background:#DFF6E8; border-color:var(--mint-deep); color:#2C6B45;}
+  .rate-btn.okay.active{ background:#FFF3D6; border-color:var(--gold); color:#8A6100;}
+  .rate-btn.hard.active{ background:#FFE1E9; border-color:var(--pink-deep); color:#B23458;}
+  .fc-nav{ display:flex; gap:12px; align-items:center; }
+  .fc-count{ font-size:13px; color:var(--ink-soft); font-weight:700;}
+  .add-card-form{ margin-top:22px; border-top:2px dashed var(--pink-soft); padding-top:18px;}
+  .form-row{ display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;}
+  .form-row > *{ flex:1; min-width:140px; }
+  select{ font-family:'Nunito',sans-serif; border-radius:14px; border:2px solid var(--pink-soft); padding:10px 12px; font-size:14px; background:#FFFBFD; color:var(--ink); }
+
+  /* ---------- NOTEBOOK ---------- */
+  .notebook-grid{ display:grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin-bottom:18px;}
+  .sticky{
+    background: var(--gold); border-radius: 4px 4px 40% 4px / 4px 4px 12% 4px; padding:16px; min-height:130px;
+    box-shadow: 3px 6px 14px rgba(0,0,0,.12); transform: rotate(var(--r,-1deg));
+    display:flex; flex-direction:column; gap:8px; cursor:pointer; transition: transform .15s ease; position:relative;
+  }
+  .sticky:hover{ transform: rotate(0deg) scale(1.03); }
+  .sticky:nth-child(3n){ background: var(--pink-soft); --r:1.2deg; }
+  .sticky:nth-child(3n+1){ background: var(--mint); --r:-1deg; }
+  .sticky h4{ margin:0; font-family:'Fredoka',sans-serif; font-size:15px; color:var(--ink);}
+  .sticky p{ margin:0; font-size:12.5px; color:var(--ink); line-height:1.4; overflow:hidden; flex:1; }
+  .sticky .del{ align-self:flex-end; font-size:11px; background:rgba(255,255,255,.6); border:none; border-radius:8px; padding:3px 8px; cursor:pointer; color:var(--pink-deep); font-weight:700;}
+  .editor{ display:none; }
+  .editor.active{ display:block; }
+
+  /* ---------- QUIZ ---------- */
+  .quiz-topbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;}
+  .progress-bar{ height:10px; border-radius:8px; background:var(--bg-deep); overflow:hidden; flex:1; margin: 0 14px;}
+  .progress-fill{ height:100%; background: linear-gradient(90deg,var(--pink),var(--gold)); width:0%; transition: width .3s ease; border-radius:8px;}
+  .q-count{ font-size:13px; font-weight:800; color:var(--ink-soft); white-space:nowrap;}
+  .q-text{ font-family:'Fredoka',sans-serif; font-size:19px; font-weight:600; margin-bottom:16px; color:var(--ink);}
+  .opt{
+    display:block; width:100%; text-align:left; background:#FFFBFD; border:2px solid var(--pink-soft); border-radius:14px;
+    padding:13px 16px; margin-bottom:10px; font-size:14.5px; color:var(--ink); cursor:pointer; font-family:'Nunito',sans-serif;
+    transition: transform .1s ease;
+  }
+  .opt:hover{ transform: translateX(3px); border-color:var(--pink);}
+  .opt.correct{ background:#DFF6E8; border-color:var(--mint-deep); color:#2C6B45; font-weight:700;}
+  .opt.wrong{ background:#FFE1E9; border-color:var(--pink-deep); color:#B23458; font-weight:700;}
+  .opt[disabled]{ cursor:default; }
+  .q-explain{ background:var(--lavender); border-radius:12px; padding:12px 14px; font-size:13.5px; color:#4A1525; margin-top:4px; display:none; font-weight:600; }
+  .q-explain.show{ display:block; }
+  .score-screen{ text-align:center; padding: 10px 0; position:relative;}
+  .score-screen .big{ font-family:'Fredoka',sans-serif; font-size:46px; color:var(--pink-deep); font-weight:700;}
+  #confettiLayer{ position:absolute; inset:0; overflow:visible; pointer-events:none; }
+  .confetti-bit{ position:absolute; top:0; font-size:20px; animation: confetti-fall 1.8s ease-in forwards; }
+  @keyframes confetti-fall{ 0%{ transform: translateY(-10px) rotate(0deg); opacity:1;} 100%{ transform: translateY(220px) rotate(360deg); opacity:0;} }
+
+  footer{ text-align:center; color:var(--ink-soft); font-size:12.5px; padding: 30px 0 10px; }
+
+  /* ---------- 3D JOURNAL BOOK ---------- */
+  .book{ position:relative; max-width:680px; margin:0 auto; perspective:1800px; }
+
+  /* -- cover -- */
+  .book-cover{
+    position:absolute; inset:0; z-index:5; cursor:pointer;
+    transform-style:preserve-3d; transform-origin: left center; backface-visibility:hidden;
+    transition: transform .9s cubic-bezier(.34,1.1,.4,1);
+    border-radius:18px; overflow:hidden;
+    background: linear-gradient(155deg,#FFC9D6,#FFB0C2 55%,#FF9FB6);
+    box-shadow: var(--shadow-3d), 6px 10px 24px rgba(74,21,37,.28);
+    border:2px solid #fff;
+    min-height:480px;
+  }
+  .book-cover::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background: repeating-linear-gradient(115deg, rgba(255,255,255,.06) 0 2px, transparent 2px 5px);
+    mix-blend-mode:overlay;
+  }
+  .book-cover:focus-visible{ outline:3px solid #fff; outline-offset:-6px; }
+  .book.open .book-cover{ transform: rotateY(-150deg); pointer-events:none; }
+  .book.open .journal-spread{ animation: pagesIn .45s ease .4s both; }
+  @keyframes pagesIn{ from{ opacity:0; transform: translateX(10px);} to{ opacity:1; transform:none; } }
+
+  .cover-spine{
+    position:absolute; left:0; top:0; bottom:0; width:26px;
+    background:
+      repeating-linear-gradient(115deg, rgba(255,255,255,.4) 0 3px, transparent 3px 9px),
+      repeating-linear-gradient(65deg, rgba(74,21,37,.18) 0 3px, transparent 3px 9px),
+      var(--pink-deep);
+    box-shadow: inset -3px 0 6px rgba(0,0,0,.18);
+  }
+  .eyelet{
+    position:absolute; left:5px; width:7px; height:7px; border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff, #E8B9C4 60%, var(--pink-deep) 100%);
+    box-shadow:0 0 0 1px rgba(255,255,255,.5);
+  }
+  .cover-charm{ position:absolute; left:11px; top:8px; width:2px; height:48px; background:rgba(255,255,255,.75); }
+  .charm-heart{
+    position:absolute; top:46px; left:-6px; width:13px; height:13px; transform:rotate(-45deg);
+    background:linear-gradient(160deg,#fff,#E3E3EA); box-shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+  .charm-heart::before, .charm-heart::after{ content:""; position:absolute; width:13px; height:13px; border-radius:50%; background:inherit; }
+  .charm-heart::before{ top:-6.5px; left:0; }
+  .charm-heart::after{ top:0; left:6.5px; }
+
+  .cover-label{
+    position:absolute; left:50%; top:42%; transform:translate(-50%,-50%);
+    background:#FFFBF3; border:2px dashed var(--pink); border-radius:14px;
+    padding:18px 20px 14px; width:64%; text-align:center;
+    box-shadow: 0 4px 10px rgba(74,21,37,.12);
+  }
+  .cover-bow{ position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-size:25px; }
+  .cover-label-text{ font-family:'Merienda',cursive; font-weight:800; font-size:clamp(19px,4.4vw,26px); color:var(--pink-deep); line-height:1.15; display:block; }
+  .cover-heart{ display:block; margin-top:7px; font-size:15px; color:var(--pink); }
+
+  .cover-patch{ position:absolute; width:44px; height:44px; }
+  .patch-flower{ top:16px; left:18px; font-size:23px; display:flex; align-items:center; justify-content:center;
+    background:#fff; border-radius:8px; border:2px solid var(--pink-soft); box-shadow:0 2px 4px rgba(74,21,37,.1); }
+  .patch-heart-gingham{
+    top:14px; right:16px; position:absolute;
+    clip-path: path('M22 38 C6 26 0 16 0 9 C0 2 6 -2 12 2 C16 4 20 8 22 12 C24 8 28 4 32 2 C38 -2 44 2 44 9 C44 16 38 26 22 38 Z');
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.6) 0 6px, rgba(255,183,197,.6) 6px 12px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.45) 0 6px, transparent 6px 12px);
+  }
+  .patch-button{
+    position:absolute; bottom:6px; left:50%; transform:translateX(-50%);
+    width:11px; height:11px; border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff, var(--pink) 70%);
+    box-shadow:0 1px 2px rgba(0,0,0,.2);
+  }
+  .cover-star{
+    position:absolute; right:16px; top:47%; width:32px; height:32px;
+    background:linear-gradient(160deg,#FFD9E2,var(--pink-soft));
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    box-shadow:0 3px 5px rgba(74,21,37,.15);
+  }
+  .patch-bow-mini{
+    position:absolute; right:14px; top:64%; width:38px; height:38px;
+    background:#fff; border-radius:8px; border:2px solid var(--pink-soft);
+    box-shadow:0 2px 4px rgba(74,21,37,.1); display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  .cover-bear{ position:absolute; bottom:14px; right:14px; font-size:36px; filter: drop-shadow(0 3px 4px rgba(74,21,37,.2)); }
+  .cover-pocket{
+    position:absolute; left:16px; bottom:14px; width:60px; height:42px;
+    background: rgba(255,255,255,.55); border:2px dashed #fff; border-radius:4px 4px 15px 15px;
+    display:flex; align-items:flex-start; justify-content:center; padding-top:6px; font-size:16px;
+  }
+  .cover-hint{ text-align:center; font-size:12.5px; color:var(--ink-soft); font-weight:800; margin:12px 0 0; transition:opacity .3s ease; }
+
+  /* -- open spread (bullet-journal pages) -- */
+  .journal-spread{
+    position:relative; display:flex; flex-direction:column; gap:20px;
+    background: linear-gradient(160deg,#FFFDF9,#FFF6F8);
+    border:2px solid var(--border-pink); border-radius:18px;
+    padding: 26px 18px 20px; box-shadow: var(--shadow-soft);
+  }
+  @media (min-width:760px){
+    .journal-spread{ flex-direction:row; padding:26px 26px 20px; }
+    .page-left, .page-right{ flex:1; min-width:0; }
+    .page-left{ padding-right:22px; border-right:2px dashed var(--pink-soft); }
+    .page-right{ padding-left:22px; }
+  }
+  .binder-clip{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%) rotate(-2deg); z-index:2;
+    width:56px; height:24px; background:linear-gradient(160deg,var(--pink),var(--pink-deep));
+    border-radius:6px; box-shadow:0 3px 6px rgba(74,21,37,.25);
+  }
+  .binder-clip::before{
+    content:""; position:absolute; left:50%; top:-11px; transform:translateX(-50%);
+    width:28px; height:20px; border:5px solid var(--pink-deep); border-radius:50%; border-bottom-color:transparent;
+  }
+  .tape{
+    position:absolute; height:24px; width:84px; opacity:.75; box-shadow:0 2px 3px rgba(0,0,0,.08); pointer-events:none;
+  }
+  .tape-1{ top:-8px; left:14px; transform:rotate(-6deg); background: repeating-linear-gradient(90deg, var(--pink-soft) 0 9px, #fff0 9px 18px), var(--pink-soft); }
+  .tape-2{ top:-8px; right:14px; transform:rotate(5deg); background: repeating-linear-gradient(90deg, var(--mint) 0 9px, #fff0 9px 18px), var(--mint); }
+
+  .spread-greeting{
+    display:flex; align-items:center; gap:8px; font-family:'Merienda',cursive; font-weight:800;
+    color:var(--pink-deep); font-size:22px; margin:4px 0 2px;
+  }
+  .spread-greeting.small{ font-size:18px; }
+  .bow-ic::before{ content:"🎀"; font-size:.85em; }
+  .spread-date{ font-size:12.5px; color:var(--ink-soft); font-weight:800; margin:0 0 14px; }
+  #journalInput{
+    background:
+      repeating-linear-gradient(180deg, transparent 0 27px, rgba(255,183,197,.35) 27px 29px),
+      #FFFDF9;
+    font-family:'Merienda',cursive; font-size:14.5px; line-height:29px; padding-top:8px;
+  }
+  .feel-card{
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.7) 0 8px, rgba(255,183,197,.3) 8px 16px);
+    border:2px solid var(--pink-soft); border-radius:14px; padding:14px 16px; margin-top:16px;
+  }
+  .feel-title{ margin:0 0 10px; font-family:'Fredoka',sans-serif; font-weight:600; color:var(--pink-deep); font-size:14px; }
+  .feel-card .mood-row{ display:flex; flex-direction:column; gap:8px; margin:0; }
+  .feel-card .mood-chip{
+    display:flex; align-items:center; gap:9px; border:none; background:transparent;
+    border-radius:8px; padding:4px 6px; cursor:pointer; font-size:14px; font-weight:700; color:var(--ink);
+  }
+  .feel-card .mood-chip::before{
+    content:attr(data-mood); display:inline-flex; align-items:center; justify-content:center;
+    width:24px; height:24px; border-radius:6px; background:#fff; border:2px solid var(--pink-soft); font-size:13px;
+  }
+  .feel-card .mood-chip.selected{ background:rgba(255,183,197,.35); }
+  .feel-card .mood-chip.selected::before{ border-color:var(--pink-deep); background:var(--pink-soft); }
+
+  .page-right .entry{
+    background:#fff; border:2px dashed var(--pink-soft); border-radius:4px 16px 16px 4px;
+    padding:14px 16px; margin-bottom:16px; box-shadow:2px 4px 8px rgba(74,21,37,.08); position:relative;
+  }
+  .page-right .entry::before{
+    content:""; position:absolute; top:-8px; left:16px; width:48px; height:16px; opacity:.75; transform:rotate(-3deg);
+    background: repeating-linear-gradient(90deg, var(--mint) 0 8px, #fff0 8px 16px), var(--mint);
+  }
+  .page-right .entry:nth-child(even)::before{
+    left:auto; right:16px; transform:rotate(3deg);
+    background: repeating-linear-gradient(90deg, var(--pink-soft) 0 8px, #fff0 8px 16px), var(--pink-soft);
+  }
+  .page-right .empty{
+    background:#FFFBF3; border:2px dashed var(--gold); border-radius:16px 16px 16px 4px;
+    padding:18px 16px; font-style:normal; font-family:'Merienda',cursive; font-weight:600; color:var(--ink);
+    text-align:left; line-height:1.6;
+  }
+
+  @media (max-width:560px){
+    .card{ padding:20px; }
+    .nav-btn{ padding:12px 14px; font-size:13.5px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="deco"></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow-heart">🌸</div>
+    <h1 class="title">Welcome, My Love</h1>
+    <p class="subtitle">My Riri, My Baby and The Love of My Life, a place for you to write everything and study.</p>
+    <div class="streak-badge" id="streakBadge">🔥 0 day streak</div>
+  </header>
+
+  <nav class="dock">
+    <button class="nav-btn active" data-page="home"><span class="ic">🏠</span>Home</button>
+    <button class="nav-btn" data-page="messages"><span class="ic">💌</span>Messages<span class="nav-badge" id="msgBadge" hidden></span></button>
+    <button class="nav-btn" data-page="journal"><span class="ic">📔</span>Journal</button>
+    <button class="nav-btn" data-page="flashcards"><span class="ic">🌷</span>Flashcards</button>
+    <button class="nav-btn" data-page="notebook"><span class="ic">🗒️</span>Notebook</button>
+    <button class="nav-btn" data-page="quiz"><span class="ic">🧠</span>Quiz</button>
+  </nav>
+
+  <main>
+    <!-- HOME / INSPIRATION -->
+    <section class="page active" id="page-home">
+      <div class="card" id="note">
+        <h2 class="page-title">💗 A note before you study</h2>
+        <div class="letter-wrap" id="letterWrap">
+          <div class="letter-folded" id="letterFolded" tabindex="0" role="button" aria-label="Unfold the letter">
+            <div class="fold-line l1"></div>
+            <div class="fold-line l2"></div>
+            <div class="letter-seal">💗</div>
+            <p class="letter-hint">tap to unfold 💌</p>
+          </div>
+          <div class="letter-open" id="letterOpen">
+            <p class="letter-salutation">My Nurse,</p>
+            <p>Even though you didn't really tell me about what you felt about everything or what's on your mind, let me tell you this:</p>
+            <p>I know you have been anxious about the future and you're literally having second thoughts about nursing. It's funny because you're worried about being the one who is "mapag-iwanan" when literally I'm still in college even though malapit na mabura sa kalendaryo age ko. Hahaha! What I'm trying to say is that, you will never be behind on your goals. So what if you're on your gap year diba? You're already doing it to prove to the universities and to yourself that you can do it! Now that you're in that position, focus on it. If the universities are full then go on another term, you will always have options baby and you will never be out of time. Okay?</p>
+            <p>I'm always proud of you on the slow days and the fast ones. Message me or FaceTime me, when you need a soft place to land.</p>
+            <p class="letter-sign">— your person 💗</p>
+            <button class="btn ghost small" id="letterFoldBtn" type="button">fold it back up</button>
+          </div>
+        </div>
+        <div class="jar-section">
+          <div class="jar" id="notesJar" tabindex="0" role="button" aria-label="Open the jar of notes">
+            <div class="jar-lid-wrap">
+              <div class="jar-bow"><span class="loop left"></span><span class="loop right"></span><span class="knot"></span></div>
+              <div class="jar-lid"></div>
+            </div>
+            <div class="jar-body">
+              <div id="jarNotesInside"></div>
+              <div class="jar-shine"></div>
+              <div class="jar-shine two"></div>
+            </div>
+          </div>
+          <div class="jar-tag">
+            <div class="tag-row"><span class="tag-swatch" style="background:#FF3D8A"></span>I love you because...</div>
+            <div class="tag-row"><span class="tag-swatch" style="background:#FF8A3D"></span>remember when?</div>
+            <div class="tag-row"><span class="tag-swatch" style="background:#FFD166"></span>song lyrics</div>
+            <div class="tag-row"><span class="tag-swatch" style="background:#4FA37E"></span>date ideas (live in ed.)</div>
+            <div class="tag-row"><span class="tag-swatch" style="background:#5B6EF5"></span>inspirational notes</div>
+          </div>
+          <p class="jar-hint">tap the jar to pull a note 🌷 — one per color, per day</p>
+          <div style="display:flex; gap:14px; flex-wrap:wrap; justify-content:center;">
+            <button class="manage-link" id="manageNotesBtn" type="button">＋ manage jar notes</button>
+            <button class="manage-link" id="syncNotesBtn" type="button">🔄 got a sync code?</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="jar-modal" id="jarModal">
+      <div class="jar-modal-inner">
+        <button class="jar-close" id="jarClose" aria-label="Close jar">✕</button>
+        <h3 id="jarModalTitle">a jar of notes, just for you</h3>
+        <div class="notes-scatter" id="notesScatter"></div>
+        <div class="note-reveal" id="noteReveal">
+          <div class="card-face" id="textRevealFace">
+            <span id="revealText"></span>
+            <span class="reveal-tag" id="revealTag"></span>
+          </div>
+          <div class="song-face" id="songRevealFace" style="display:none;">
+            <div class="song-art">♪</div>
+            <div class="song-title" id="songTitle"></div>
+            <div class="song-artist" id="songArtist"></div>
+            <a class="song-listen-btn" id="songListenBtn" href="#" target="_blank" rel="noopener">▶ Listen on Apple Music</a>
+            <p class="song-note">opens Apple Music in a new tab</p>
+          </div>
+          <div class="reveal-actions">
+            <button class="btn ghost small" id="backToJarBtn">← back to the jar</button>
+            <button class="btn small" id="pullAnotherBtn">🌷 pull another</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="jar-modal" id="manageModal">
+      <div class="jar-modal-inner">
+        <button class="jar-close" id="manageClose" aria-label="Close manage notes">✕</button>
+        <h3>manage jar notes</h3>
+        <div class="fc-controls" id="manageCatTabs"></div>
+        <div id="manageList"></div>
+        <div class="add-card-form">
+          <h2 class="page-title" style="font-size:16px;">➕ add a new note</h2>
+          <div id="manageAddRow"></div>
+        </div>
+        <div style="margin-top:18px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <button class="btn ghost" id="copySyncCodeBtn" type="button">📋 copy sync code</button>
+          <button class="btn" id="manageSaveBtn">Save category</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="jar-modal" id="syncModal">
+      <div class="jar-modal-inner">
+        <button class="jar-close" id="syncClose" aria-label="Close sync">✕</button>
+        <h3>sync from your person</h3>
+        <p class="lead" style="margin-top:0;">Paste the code your person sent you, then tap apply — it works for jar notes or messages, whichever code it is.</p>
+        <textarea id="syncCodeInput" rows="5" placeholder="Paste the sync code here..." style="font-family:monospace; font-size:12px;"></textarea>
+        <p id="syncStatus" style="min-height:1.3em; font-size:12.5px; font-weight:700; color:var(--mint-deep); margin:8px 0;"></p>
+        <div style="text-align:right;">
+          <button class="btn" id="applySyncCodeBtn" type="button">Apply code</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <section class="page" id="page-messages">
+      <div class="card">
+        <h2 class="page-title">💌 Messages for My Love</h2>
+        <p class="lead">A letter, whenever there's one waiting. Tap an envelope to open it.</p>
+        <div id="messagesList"></div>
+        <div style="margin-top:18px; text-align:center;">
+          <button class="manage-link" id="writeMessageBtn" type="button">✎ write a new message</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="jar-modal" id="messageReadModal">
+      <div class="jar-modal-inner">
+        <button class="jar-close" id="messageReadClose" aria-label="Close message">✕</button>
+        <p class="letter-salutation" id="msgReadSubject" style="margin: 0 20px 4px 0;"></p>
+        <p style="font-size:12px; color:var(--ink-soft); font-weight:800; margin:0 0 16px;" id="msgReadDate"></p>
+        <div class="letter-open" id="msgReadBody" style="display:block; box-shadow:none; padding:0; background:none; border:none;"></div>
+      </div>
+    </div>
+
+    <div class="jar-modal" id="manageMessagesModal">
+      <div class="jar-modal-inner">
+        <button class="jar-close" id="manageMessagesClose" aria-label="Close manage messages">✕</button>
+        <h3>write &amp; manage messages</h3>
+        <div id="manageMessagesList"></div>
+        <div class="add-card-form">
+          <h2 class="page-title" style="font-size:16px;">➕ add a new message</h2>
+          <div class="manage-row"><input type="text" id="newMsgSubject" placeholder="Subject (e.g. Happy Monthsary)"></div>
+          <div class="manage-row"><textarea id="newMsgBody" rows="5" placeholder="Write your message..."></textarea></div>
+        </div>
+        <div style="margin-top:18px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <button class="btn ghost" id="copyMsgSyncCodeBtn" type="button">📋 copy sync code</button>
+          <button class="btn" id="manageMessagesSaveBtn">Save messages</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOURNAL -->
+    <section class="page" id="page-journal">
+      <div class="book" id="journalBook">
+        <div class="book-cover" id="journalCover" tabindex="0" role="button" aria-label="Open Riri's Journal">
+          <div class="cover-spine">
+            <span class="eyelet" style="top:10%"></span>
+            <span class="eyelet" style="top:27%"></span>
+            <span class="eyelet" style="top:44%"></span>
+            <span class="eyelet" style="top:61%"></span>
+            <span class="eyelet" style="top:78%"></span>
+            <span class="eyelet" style="top:93%"></span>
+          </div>
+          <div class="cover-charm"><span class="charm-heart"></span></div>
+          <div class="cover-patch patch-flower">🌸</div>
+          <div class="cover-patch patch-heart-gingham"><span class="patch-button"></span></div>
+          <div class="cover-star"></div>
+          <div class="cover-label">
+            <span class="cover-bow">🎀</span>
+            <span class="cover-label-text">Riri's<br>Journal</span>
+            <span class="cover-heart">♥</span>
+          </div>
+          <div class="patch-bow-mini">🎀</div>
+          <div class="cover-pocket">🌷</div>
+          <div class="cover-bear">🧸</div>
+        </div>
+
+        <div class="journal-spread">
+          <div class="binder-clip"></div>
+
+          <div class="page-left">
+            <div class="tape tape-1"></div>
+            <h3 class="spread-greeting"><span class="bow-ic"></span> hello, today!</h3>
+            <p class="spread-date" id="journalDate"></p>
+            <textarea id="journalInput" rows="6" placeholder="Another new day, another chance to..."></textarea>
+
+            <div class="feel-card">
+              <p class="feel-title">today I'm feeling</p>
+              <div class="mood-row" id="moodRow">
+                <span class="mood-chip" data-mood="🌸">soft</span>
+                <span class="mood-chip" data-mood="💪">focused</span>
+                <span class="mood-chip" data-mood="😮‍💨">tired</span>
+                <span class="mood-chip" data-mood="🥹">emotional</span>
+                <span class="mood-chip" data-mood="🎉">proud</span>
+              </div>
+            </div>
+
+            <div style="margin-top:14px; text-align:right;">
+              <button class="btn" id="saveEntryBtn">save today's page 💗</button>
+            </div>
+          </div>
+
+          <div class="page-right">
+            <div class="tape tape-2"></div>
+            <h3 class="spread-greeting small"><span class="bow-ic small"></span> your entries</h3>
+            <div id="entryList"></div>
+          </div>
+        </div>
+      </div>
+      <p class="cover-hint" id="coverHint">tap the journal to open it 🌷</p>
+    </section>
+
+    <!-- FLASHCARDS -->
+    <section class="page" id="page-flashcards">
+      <div class="card">
+        <h2 class="page-title">🌷 Flashcards</h2>
+        <p class="lead">Tap a card to flip it. Rate how well you know it, filter by subject, or add your own from lecture notes.</p>
+        <div class="fc-controls" id="fcFilters">
+          <span class="chip selected" data-cat="all">All</span>
+          <span class="chip" data-cat="ELA">ELA</span>
+          <span class="chip" data-cat="Biology">Biology</span>
+          <span class="chip" data-cat="needsreview">Needs review</span>
+        </div>
+        <div class="fc-stage">
+          <div class="flip-card" id="flipCard">
+            <div class="flip-inner">
+              <div class="flip-face flip-front"><span class="ribbon" id="fcTagFront"></span><span class="mastery-badge" id="fcBadgeFront"></span><span id="fcFrontText"></span></div>
+              <div class="flip-face flip-back"><span class="ribbon on-back" id="fcTagBack"></span><span id="fcBackText"></span></div>
+            </div>
+          </div>
+          <div class="rate-row">
+            <button class="rate-btn hard" data-rate="hard">😅 Hard</button>
+            <button class="rate-btn okay" data-rate="okay">🙂 Okay</button>
+            <button class="rate-btn easy" data-rate="mastered">✅ Mastered</button>
+          </div>
+          <div class="fc-nav">
+            <button class="btn ghost small" id="fcPrev">← Prev</button>
+            <span class="fc-count" id="fcCount">1 / 1</span>
+            <button class="btn ghost small" id="fcNext">Next →</button>
+          </div>
+        </div>
+        <div class="add-card-form">
+          <h2 class="page-title" style="font-size:17px;">➕ Add your own card</h2>
+          <div class="form-row">
+            <select id="newCat"><option value="ELA">ELA</option><option value="Biology">Biology</option></select>
+            <input type="text" id="newFront" placeholder="Front (term / question)">
+          </div>
+          <div class="form-row">
+            <input type="text" id="newBack" placeholder="Back (definition / answer)">
+            <button class="btn mint" id="addCardBtn" style="flex:0 0 auto;">Add card</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOTEBOOK -->
+    <section class="page" id="page-notebook">
+      <div class="card">
+        <h2 class="page-title">🗒️ Notebook</h2>
+        <p class="lead">Sticky notes for formulas, vocab lists, or reminders. Click a note to edit it.</p>
+        <button class="btn" id="newNoteBtn" style="margin-bottom:16px;">➕ New sticky note</button>
+        <div id="editorBox" class="editor">
+          <input type="text" id="noteTitle" placeholder="Title" style="margin-bottom:10px;">
+          <textarea id="noteBody" rows="5" placeholder="Write your note..."></textarea>
+          <div style="margin-top:10px; display:flex; gap:10px;">
+            <button class="btn" id="saveNoteBtn">Save note</button>
+            <button class="btn ghost" id="cancelNoteBtn">Cancel</button>
+          </div>
+        </div>
+        <div class="notebook-grid" id="notebookGrid"></div>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="page" id="page-quiz">
+      <div class="card">
+        <h2 class="page-title">🧠 Quiz time</h2>
+        <p class="lead">A quick mix of ELA and Biology gap-year review questions. Retake anytime.</p>
+        <div id="quizIntro">
+          <button class="btn" id="startQuizBtn">Start quiz 🌸</button>
+        </div>
+        <div id="quizBody" style="display:none;">
+          <div class="quiz-topbar">
+            <span class="q-count" id="qCount"></span>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          </div>
+          <div class="q-text" id="qText"></div>
+          <div id="qOptions"></div>
+          <div class="q-explain" id="qExplain"></div>
+        </div>
+        <div id="quizScore" class="score-screen" style="display:none;">
+          <div id="confettiLayer"></div>
+          <div class="big" id="scoreBig"></div>
+          <p id="scoreMsg" style="color:var(--ink-soft); font-weight:700;"></p>
+          <button class="btn" id="retakeBtn">Retake quiz</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>made with love for my wife — Haze</footer>
+</div>
+
+<script>
+/* ---------------- storage helpers ---------------- */
+async function storeGet(key){
+  try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; }
+  catch(e){ return null; }
+}
+async function storeSet(key, value){
+  try{ localStorage.setItem(key, JSON.stringify(value)); }
+  catch(e){ console.error('storage set failed', e); }
+}
+
+/* ---------------- navigation ---------------- */
+function switchPage(name){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.page===name));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(name!=='journal'){
+    const jb=document.getElementById('journalBook');
+    const ch=document.getElementById('coverHint');
+    if(jb) jb.classList.remove('open');
+    if(ch) ch.style.opacity='1';
+  }
+}
+
+/* ---------------- 3D journal book ---------------- */
+(function(){
+  const journalBook = document.getElementById('journalBook');
+  const journalCover = document.getElementById('journalCover');
+  const coverHint = document.getElementById('coverHint');
+  function openJournalBook(){
+    journalBook.classList.add('open');
+    if(coverHint) coverHint.style.opacity='0';
+  }
+  journalCover.addEventListener('click', openJournalBook);
+  journalCover.addEventListener('keydown', e=>{
+    if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openJournalBook(); }
+  });
+  const journalDate = document.getElementById('journalDate');
+  if(journalDate){
+    journalDate.textContent = new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'});
+  }
+})();
+
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    if(btn.classList.contains('active')) return;
+    switchPage(btn.dataset.page);
+  });
+});
+
+/* ---------------- floating decorations (hearts + sparkles drifting upward) ---------------- */
+const decoItems = ['🌸','💗','✨','🌟','🌿','💫','🩷'];
+const deco = document.getElementById('deco');
+const floaters = [];
+for(let i=0;i<16;i++){
+  const el = document.createElement('div');
+  el.className='float-item';
+  el.textContent = decoItems[i % decoItems.length];
+  el.style.fontSize = (16+Math.random()*20)+'px';
+  deco.appendChild(el);
+  floaters.push({
+    el,
+    depth: 8+Math.random()*24,
+    left: Math.random()*100,
+    speed: 6+Math.random()*10,
+    startTop: 100+Math.random()*40,
+    phase: Math.random()*Math.PI*2
+  });
+}
+let mouseX=0, mouseY=0;
+window.addEventListener('mousemove', e=>{
+  mouseX = (e.clientX/window.innerWidth - .5);
+  mouseY = (e.clientY/window.innerHeight - .5);
+});
+function animateDeco(t){
+  floaters.forEach(f=>{
+    const cycle = ((t/1000 * (f.speed/40)) + f.phase) % 1;
+    const top = f.startTop - cycle*140;
+    const sway = Math.sin(t/1300 + f.phase)*14;
+    const px = mouseX * f.depth;
+    const py = mouseY * f.depth;
+    f.el.style.top = top+'vh';
+    f.el.style.left = 'calc(' + f.left + 'vw + ' + sway + 'px)';
+    f.el.style.transform = `translate3d(${px}px, ${py}px, 0)`;
+  });
+  requestAnimationFrame(animateDeco);
+}
+requestAnimationFrame(animateDeco);
+
+/* ---------------- FOLDED LETTER ---------------- */
+const letterWrap = document.getElementById('letterWrap');
+document.getElementById('letterFolded').addEventListener('click', ()=> letterWrap.classList.add('open'));
+document.getElementById('letterFolded').addEventListener('keydown', e=>{
+  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); letterWrap.classList.add('open'); }
+});
+document.getElementById('letterFoldBtn').addEventListener('click', ()=> letterWrap.classList.remove('open'));
+
+/* ---------------- STREAK TRACKER ---------------- */
+async function updateStreak(){
+  const today = new Date().toDateString();
+  const data = (await storeGet('riri-streak')) || {count:0, last:null};
+  if(data.last !== today){
+    const y = new Date(); y.setDate(y.getDate()-1);
+    data.count = (data.last === y.toDateString()) ? data.count+1 : 1;
+    data.last = today;
+    await storeSet('riri-streak', data);
+  }
+  document.getElementById('streakBadge').textContent = `🔥 ${data.count} day streak`;
+}
+updateStreak();
+
+/* ---------------- INSPIRATION: JAR OF NOTES ---------------- */
+const CATEGORY_META = [
+  { key:'love', label:"I love you because...", color:'#FF3D8A', type:'text' },
+  { key:'remember', label:"Remember when?", color:'#FF8A3D', type:'text' },
+  { key:'songs', label:"Song lyrics", color:'#FFD166', type:'song' },
+  { key:'dates', label:"Date ideas (Live In Edition)", color:'#4FA37E', type:'text' },
+  { key:'inspire', label:"Inspirational notes", color:'#5B6EF5', type:'text' }
+];
+const DEFAULT_ITEMS = {
+  love: [
+    "You made sure that we fix the misunderstanding before we sleep.",
+    "Hearing your voice and laugh just calms my nerves.",
+    "You never let a bad day turn into a bad us.",
+    "You're you, no filter.",
+    "Loving you is the easiest hard thing I've ever done. Easy because it's you, hard because you're so far away.",
+    "You will always be my favorite part of every day.",
+    "I see how much thought and care you put into everything you do.",
+    "You are my riri, my baby and my wife. The love of my life."
+  ],
+  remember: [
+    'Remember when we first started talking in April and you make "papansin" to me? Feeling close yan siya. Hahaha',
+    'Remember your first "Mahal ko na yata siya" moment. Hmm, half-joking, not joking at all?',
+    "Remember the call that ran so late neither of us noticed the sun coming up?",
+    "Remember the first time you called me just to vent about everything and I just listened?",
+    "Remember when we just say I love you multiple times to each other?",
+    "Remember when we both kept sending house reels on Instagram, like we were building our future home.",
+    "Remember when I first said I like you?"
+  ],
+  songs: [
+    {title:"Tadhana", artist:"Up Dharma Down"},
+    {title:"Binibini", artist:"Zack Tabudlo"},
+    {title:"Balisong (Transformed)", artist:"Rico Blanco"},
+    {title:"Tingin", artist:"Cup of Joe"},
+    {title:"Ikaw Lamang", artist:"Silent Sanctuary"},
+    {title:"Mahal Magmahal", artist:"Esremborak"},
+    {title:"Libu-Libong Buwan (Uuwian)", artist:"Kyle Raphael"},
+    {title:"Kabisado", artist:"IV of Spades"},
+    {title:"711", artist:"TONEEJAY"},
+    {title:"Ikaw at Ako", artist:"Johnoy Danao"},
+    {title:"Bawat Daan", artist:"Ebe Dancel"},
+    {title:"Bakit Labia Kitang Mahal", artist:""}
+  ],
+  dates: [
+    "Dinner dates every end of the week, or every other week.",
+    "A slow walk somewhere — just somewhere, together.",
+    "A lazy morning making breakfast together, nothing fancy, just each other.",
+    "A drive with no destination, just yapping the way you always do, except in person.",
+    "Making love! Hahaha. Hmmm.",
+    "Dinner dates every Friday, just us watching movies at home."
+  ],
+  inspire: [
+    "Every mile between us is temporary, we'll see each other the soonest.",
+    "Keep going, future nurse. I'm proud of you on your hardest days and your easiest ones.",
+    "Take a deep breath! You are handling things much better than you think you are.",
+    "Remember to give yourself the same care you give everyone else.",
+    "Whatever is on your plate today, you're more than capable of handling it.",
+    "Don't forget to take a pause today just for yourself.",
+    "Your effort and dedication never go unnoticed.",
+    "You don't have to carry everything all at once. Do it, step by step. I'm here!"
+  ]
+};
+
+let CATEGORIES = [];
+let FLAT_NOTES = [];
+let openedToday = { date:null, cats:{} };
+
+function rebuildFlatNotes(){
+  FLAT_NOTES = [];
+  CATEGORIES.forEach((cat,ci)=> cat.items.forEach((_,ii)=> FLAT_NOTES.push([ci,ii])));
+}
+async function loadCategories(){
+  let stored = await storeGet('riri-jar-items');
+  if(!stored){
+    stored = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+    await storeSet('riri-jar-items', stored);
+  }
+  CATEGORIES = CATEGORY_META.map(meta => ({ ...meta, items: stored[meta.key] || [] }));
+  rebuildFlatNotes();
+}
+async function saveCategoryItems(catKey, items){
+  const stored = (await storeGet('riri-jar-items')) || {};
+  stored[catKey] = items;
+  await storeSet('riri-jar-items', stored);
+  const cat = CATEGORIES.find(c=>c.key===catKey);
+  if(cat) cat.items = items;
+  rebuildFlatNotes();
+}
+
+function todayStr(){ return new Date().toDateString(); }
+async function loadOpenedToday(){
+  const data = await storeGet('riri-jar-opened');
+  if(!data || data.date !== todayStr()){
+    openedToday = { date: todayStr(), cats:{} };
+    await storeSet('riri-jar-opened', openedToday);
+  } else {
+    openedToday = data;
+  }
+}
+async function markCategoryOpenedToday(catKey){
+  if(openedToday.date !== todayStr()){ await loadOpenedToday(); }
+  openedToday.cats[catKey] = true;
+  await storeSet('riri-jar-opened', openedToday);
+}
+function isCategoryLockedToday(catKey){
+  return openedToday.date === todayStr() && !!openedToday.cats[catKey];
+}
+
+function renderJarInside(){
+  const wrap = document.getElementById('jarNotesInside');
+  wrap.innerHTML = '';
+  const colors = [];
+  CATEGORIES.forEach(cat=> cat.items.forEach(()=> colors.push(cat.color)));
+  const cols = 6, rows = Math.ceil(colors.length/cols);
+  colors.forEach((color,i)=>{
+    const r = Math.floor(i/cols), c = i%cols;
+    const n = document.createElement('div');
+    n.className='mini-note';
+    const left = 4 + c*(92/(cols-1)) + (Math.random()-0.5)*7;
+    const top = 30 + r*(62/Math.max(1,rows-1)) + (Math.random()-0.5)*4;
+    n.style.left = Math.max(2, Math.min(92, left))+'%';
+    n.style.top = Math.max(24, Math.min(94, top))+'%';
+    n.style.width = (16+Math.random()*6)+'px';
+    n.style.height = (12+Math.random()*5)+'px';
+    n.style.background = color;
+    n.style.setProperty('--rot', (Math.random()*40-20)+'deg');
+    n.style.animationDelay = (i*0.06)+'s';
+    wrap.appendChild(n);
+  });
+}
+
+async function openJarModal(){
+  await loadOpenedToday();
+  document.getElementById('jarModal').classList.add('open');
+  document.getElementById('noteReveal').classList.remove('show');
+  document.getElementById('notesScatter').style.display='flex';
+  document.getElementById('jarModalTitle').style.display='block';
+  renderScatterNotes();
+}
+function closeJarModal(){
+  document.getElementById('jarModal').classList.remove('open');
+}
+function renderScatterNotes(){
+  const scatter = document.getElementById('notesScatter');
+  scatter.innerHTML = '';
+  const items = [];
+  CATEGORIES.forEach((cat,ci)=>{
+    if(isCategoryLockedToday(cat.key)){
+      items.push({ locked:true, cat });
+      return;
+    }
+    cat.items.forEach((item,ii)=>{
+      items.push({ locked:false, cat, ci, ii });
+    });
+  });
+  for(let i=items.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  items.forEach(it=>{
+    const el = document.createElement('div');
+    if(it.locked){
+      el.className='scatter-note locked';
+      el.style.background = '#ECE8E2';
+      el.innerHTML = '🔒<br><span>'+it.cat.label+'</span>';
+      scatter.appendChild(el);
+      return;
+    }
+    el.className='scatter-note mystery';
+    el.style.background = it.cat.color;
+    el.style.setProperty('--rot', (Math.random()*16-8)+'deg');
+    el.innerHTML = it.cat.type==='song' ? '♪' : '💌';
+    el.addEventListener('click', ()=> revealNote(it.ci, it.ii));
+    scatter.appendChild(el);
+  });
+}
+function updatePullAnotherAvailability(excludeCi, excludeIi){
+  const btn = document.getElementById('pullAnotherBtn');
+  const hasCandidate = FLAT_NOTES.some(([ci,ii])=>
+    !(ci===excludeCi && ii===excludeIi) && !isCategoryLockedToday(CATEGORIES[ci].key)
+  );
+  btn.disabled = !hasCandidate;
+  btn.textContent = hasCandidate ? '🌷 pull another' : 'all done for today 💗';
+}
+async function revealNote(ci, ii){
+  const cat = CATEGORIES[ci];
+  const item = cat.items[ii];
+  await markCategoryOpenedToday(cat.key);
+  document.getElementById('notesScatter').style.display='none';
+  document.getElementById('jarModalTitle').style.display='none';
+  document.getElementById('noteReveal').classList.add('show');
+  document.getElementById('noteReveal').dataset.cat = ci;
+  document.getElementById('noteReveal').dataset.item = ii;
+
+  if(cat.type==='song'){
+    document.getElementById('textRevealFace').style.display='none';
+    document.getElementById('songRevealFace').style.display='block';
+    document.getElementById('songTitle').textContent = item.title;
+    document.getElementById('songArtist').textContent = item.artist || '';
+    const query = encodeURIComponent(item.title + (item.artist ? ' '+item.artist : ''));
+    document.getElementById('songListenBtn').href = 'https://music.apple.com/us/search?term='+query;
+  } else {
+    document.getElementById('songRevealFace').style.display='none';
+    document.getElementById('textRevealFace').style.display='block';
+    document.getElementById('revealText').textContent = '"'+item+'"';
+    document.getElementById('revealTag').textContent = cat.label;
+  }
+  updatePullAnotherAvailability(ci, ii);
+}
+const jarEl = document.getElementById('notesJar');
+function triggerJar(){
+  jarEl.classList.add('opening');
+  setTimeout(()=>{ jarEl.classList.remove('opening'); openJarModal(); }, 500);
+}
+jarEl.addEventListener('click', triggerJar);
+jarEl.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); triggerJar(); } });
+document.getElementById('jarClose').addEventListener('click', closeJarModal);
+document.getElementById('jarModal').addEventListener('click', e=>{ if(e.target.id==='jarModal') closeJarModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeJarModal(); });
+document.getElementById('backToJarBtn').addEventListener('click', ()=>{
+  document.getElementById('noteReveal').classList.remove('show');
+  document.getElementById('notesScatter').style.display='flex';
+  document.getElementById('jarModalTitle').style.display='block';
+  renderScatterNotes();
+});
+document.getElementById('pullAnotherBtn').addEventListener('click', async ()=>{
+  const curCi = Number(document.getElementById('noteReveal').dataset.cat);
+  const curIi = Number(document.getElementById('noteReveal').dataset.item);
+  const candidates = FLAT_NOTES.filter(([ci,ii])=>
+    !(ci===curCi && ii===curIi) && !isCategoryLockedToday(CATEGORIES[ci].key)
+  );
+  if(candidates.length===0) return;
+  const next = candidates[Math.floor(Math.random()*candidates.length)];
+  await revealNote(next[0], next[1]);
+});
+
+/* ---------------- MANAGE JAR NOTES (add / edit) ---------------- */
+function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;'); }
+let manageCat = CATEGORY_META[0].key;
+function renderManageTabs(){
+  const wrap = document.getElementById('manageCatTabs');
+  wrap.innerHTML = '';
+  CATEGORIES.forEach(cat=>{
+    const b = document.createElement('span');
+    b.className = 'chip' + (cat.key===manageCat ? ' selected' : '');
+    b.textContent = cat.label;
+    b.addEventListener('click', ()=>{ manageCat = cat.key; renderManageTabs(); renderManageList(); });
+    wrap.appendChild(b);
+  });
+}
+function renderManageList(){
+  const cat = CATEGORIES.find(c=>c.key===manageCat);
+  const list = document.getElementById('manageList');
+  list.innerHTML = '';
+  cat.items.forEach(item=>{
+    const row = document.createElement('div');
+    row.className = 'manage-row';
+    if(cat.type==='song'){
+      row.innerHTML =
+        '<input type="text" class="m-title" value="'+escapeAttr(item.title)+'" placeholder="Song title">'+
+        '<input type="text" class="m-artist" value="'+escapeAttr(item.artist||'')+'" placeholder="Artist">'+
+        '<button type="button" class="del-row" aria-label="Delete">✕</button>';
+    } else {
+      row.innerHTML =
+        '<textarea class="m-text" rows="2">'+escapeHtml(item)+'</textarea>'+
+        '<button type="button" class="del-row" aria-label="Delete">✕</button>';
+    }
+    row.querySelector('.del-row').addEventListener('click', ()=> row.remove());
+    list.appendChild(row);
+  });
+  const addRow = document.getElementById('manageAddRow');
+  addRow.innerHTML = cat.type==='song'
+    ? '<div class="manage-row"><input type="text" id="newSongTitle" placeholder="Song title"><input type="text" id="newSongArtist" placeholder="Artist"></div>'
+    : '<div class="manage-row"><textarea id="newTextNote" rows="2" placeholder="Write a new note..."></textarea></div>';
+}
+document.getElementById('manageNotesBtn').addEventListener('click', ()=>{
+  renderManageTabs();
+  renderManageList();
+  document.getElementById('manageModal').classList.add('open');
+});
+document.getElementById('manageClose').addEventListener('click', ()=>{
+  document.getElementById('manageModal').classList.remove('open');
+});
+document.getElementById('manageModal').addEventListener('click', e=>{
+  if(e.target.id==='manageModal') document.getElementById('manageModal').classList.remove('open');
+});
+document.getElementById('manageSaveBtn').addEventListener('click', async ()=>{
+  const cat = CATEGORIES.find(c=>c.key===manageCat);
+  const rows = Array.from(document.querySelectorAll('#manageList .manage-row'));
+  let items;
+  if(cat.type==='song'){
+    items = rows.map(r=>({
+      title: r.querySelector('.m-title').value.trim(),
+      artist: r.querySelector('.m-artist').value.trim()
+    })).filter(it=>it.title);
+    const newTitle = document.getElementById('newSongTitle').value.trim();
+    const newArtist = document.getElementById('newSongArtist').value.trim();
+    if(newTitle) items.push({title:newTitle, artist:newArtist});
+  } else {
+    items = rows.map(r=> r.querySelector('.m-text').value.trim()).filter(Boolean);
+    const newText = document.getElementById('newTextNote').value.trim();
+    if(newText) items.push(newText);
+  }
+  await saveCategoryItems(manageCat, items);
+  renderManageList();
+  renderJarInside();
+});
+
+/* ---------------- SYNC CODE (export / import jar items) ---------------- */
+function b64EncodeUtf8(str){ return btoa(unescape(encodeURIComponent(str))); }
+function b64DecodeUtf8(str){ return decodeURIComponent(escape(atob(str))); }
+
+document.getElementById('copySyncCodeBtn').addEventListener('click', async ()=>{
+  const stored = (await storeGet('riri-jar-items')) || {};
+  const code = 'RIRIJAR1:' + b64EncodeUtf8(JSON.stringify(stored));
+  const btn = document.getElementById('copySyncCodeBtn');
+  function done(ok){
+    btn.textContent = ok ? '✓ copied — now send it to her' : 'copy failed — select & copy manually';
+    setTimeout(()=>{ btn.textContent = '📋 copy sync code'; }, 2400);
+  }
+  try{
+    await navigator.clipboard.writeText(code);
+    done(true);
+  }catch(e){
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = code; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      done(true);
+    }catch(e2){ done(false); }
+  }
+});
+
+document.getElementById('syncNotesBtn').addEventListener('click', ()=>{
+  document.getElementById('syncStatus').textContent = '';
+  document.getElementById('syncCodeInput').value = '';
+  document.getElementById('syncModal').classList.add('open');
+});
+document.getElementById('syncClose').addEventListener('click', ()=>{
+  document.getElementById('syncModal').classList.remove('open');
+});
+document.getElementById('syncModal').addEventListener('click', e=>{
+  if(e.target.id==='syncModal') document.getElementById('syncModal').classList.remove('open');
+});
+document.getElementById('applySyncCodeBtn').addEventListener('click', async ()=>{
+  const status = document.getElementById('syncStatus');
+  const raw = document.getElementById('syncCodeInput').value.trim();
+
+  if(raw.startsWith('RIRIJAR1:')){
+    try{
+      const parsed = JSON.parse(b64DecodeUtf8(raw.slice('RIRIJAR1:'.length)));
+      const validKeys = CATEGORY_META.map(m=>m.key);
+      const cleaned = {};
+      validKeys.forEach(k=>{ if(Array.isArray(parsed[k])) cleaned[k] = parsed[k]; });
+      if(Object.keys(cleaned).length===0){ throw new Error('empty'); }
+      await storeSet('riri-jar-items', { ...(await storeGet('riri-jar-items') || {}), ...cleaned });
+      await loadCategories();
+      renderJarInside();
+      status.style.color = 'var(--mint-deep)';
+      status.textContent = "Synced! Your jar is up to date. 💗";
+      setTimeout(()=>{ document.getElementById('syncModal').classList.remove('open'); }, 1200);
+    }catch(e){
+      status.style.color = 'var(--pink-deep)';
+      status.textContent = "Couldn't read that code — ask for a fresh one.";
+    }
+    return;
+  }
+
+  if(raw.startsWith('RIRIMSG1:')){
+    try{
+      const incoming = JSON.parse(b64DecodeUtf8(raw.slice('RIRIMSG1:'.length)));
+      if(!Array.isArray(incoming)) throw new Error('bad shape');
+      const localById = {};
+      MESSAGES.forEach(m=> localById[m.id]=m);
+      const merged = incoming.map(m=>({
+        ...m,
+        read: localById[m.id] ? localById[m.id].read : false
+      }));
+      await saveMessages(merged);
+      renderMessagesList();
+      status.style.color = 'var(--mint-deep)';
+      status.textContent = "Synced! New messages are waiting. 💌";
+      setTimeout(()=>{ document.getElementById('syncModal').classList.remove('open'); }, 1200);
+    }catch(e){
+      status.style.color = 'var(--pink-deep)';
+      status.textContent = "Couldn't read that code — ask for a fresh one.";
+    }
+    return;
+  }
+
+  status.style.color = 'var(--pink-deep)';
+  status.textContent = "That doesn't look like a sync code — check you copied the whole thing.";
+});
+
+(async function initJar(){
+  await loadCategories();
+  await loadOpenedToday();
+  renderJarInside();
+})();
+
+/* ---------------- MESSAGES ---------------- */
+const DEFAULT_MESSAGES = [
+  {
+    id: 'seed-monthsary',
+    subject: '🎉 Happy Monthsary',
+    date: new Date().toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'}),
+    body: "My Wife,\n\nHappy Monthsary! Another month passed, all the laughters and tears we shed. The easy and busy days we had.\n\nAlways remember that, you will always be the person who I would randomly think of in my busiest time. You will always be the person I run to whenever I want someone to talk to. You will always be that person, I love every tick of the clock. You will always be in every beat of my heart. I will always appreciate all the kind words, the silly jokes you pull, it keeps me going my love. You will always be my kindest and good girl. I will always support you no matter what track you go, what career you pursue and what passion you play. You will always always have me, from behind and from your side holding your hands. I will always raise you, flex you and make sure you're in the stand, hoping you will not see me less. I hope you will see me as your partner on every step and phase of our life. I'm sure of you, and I'm sure of our relationship and the future that this will bring. I hope that no matter the situation is we will always choose each other and stay together. We will choose to lower down our pride and ego, we choose to understand every perspective of each other and we choose to calm down and communicate during the fight and misunderstanding. I wanna see us together in the future and moving forward.\n\nI will always love you with all my heart, Ri.",
+    read: false
+  }
+];
+let MESSAGES = [];
+
+async function loadMessages(){
+  let stored = await storeGet('riri-messages');
+  if(!stored){
+    stored = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
+    await storeSet('riri-messages', stored);
+  }
+  MESSAGES = stored;
+}
+async function saveMessages(list){
+  MESSAGES = list;
+  await storeSet('riri-messages', list);
+}
+function updateMsgBadge(){
+  const badge = document.getElementById('msgBadge');
+  const unread = MESSAGES.filter(m=>!m.read).length;
+  if(unread>0){ badge.hidden=false; badge.textContent = unread; }
+  else { badge.hidden=true; }
+}
+function renderMessagesList(){
+  const wrap = document.getElementById('messagesList');
+  if(MESSAGES.length===0){
+    wrap.innerHTML = '<p class="empty">No messages yet — check back soon. 💌</p>';
+    updateMsgBadge();
+    return;
+  }
+  const sorted = MESSAGES.slice().reverse();
+  wrap.innerHTML = '<div class="messages-grid">' + sorted.map(m=>`
+    <div class="envelope" data-id="${escapeAttr(m.id)}" tabindex="0" role="button" aria-label="Open message: ${escapeAttr(m.subject)}">
+      <div class="envelope-flap"></div>
+      ${!m.read ? '<span class="envelope-new">new</span>' : ''}
+      <div class="envelope-seal">💗</div>
+      <p class="envelope-subject">${escapeHtml(m.subject)}</p>
+      <p class="envelope-date">${escapeHtml(m.date)}</p>
+    </div>
+  `).join('') + '</div>';
+  wrap.querySelectorAll('.envelope').forEach(el=>{
+    const open = ()=> openMessage(el.dataset.id);
+    el.addEventListener('click', open);
+    el.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); } });
+  });
+  updateMsgBadge();
+}
+async function openMessage(id){
+  const msg = MESSAGES.find(m=>m.id===id);
+  if(!msg) return;
+  document.getElementById('msgReadSubject').textContent = msg.subject;
+  document.getElementById('msgReadDate').textContent = msg.date;
+  document.getElementById('msgReadBody').innerHTML = msg.body.split('\n\n').map(p=>`<p>${escapeHtml(p)}</p>`).join('');
+  document.getElementById('messageReadModal').classList.add('open');
+  if(!msg.read){
+    msg.read = true;
+    await saveMessages(MESSAGES);
+    renderMessagesList();
+  }
+}
+document.getElementById('messageReadClose').addEventListener('click', ()=>{
+  document.getElementById('messageReadModal').classList.remove('open');
+});
+document.getElementById('messageReadModal').addEventListener('click', e=>{
+  if(e.target.id==='messageReadModal') document.getElementById('messageReadModal').classList.remove('open');
+});
+
+/* ---- manage / write messages ---- */
+function renderManageMessagesList(){
+  const list = document.getElementById('manageMessagesList');
+  list.innerHTML = MESSAGES.map(m=>`
+    <div class="manage-row" data-id="${escapeAttr(m.id)}" style="flex-direction:column; align-items:stretch; border-bottom:2px dashed var(--pink-soft); padding-bottom:12px;">
+      <div style="display:flex; gap:8px;">
+        <input type="text" class="m-subject" value="${escapeAttr(m.subject)}" placeholder="Subject">
+        <button type="button" class="del-row" aria-label="Delete">✕</button>
+      </div>
+      <textarea class="m-body" rows="4" style="margin-top:8px;">${escapeHtml(m.body)}</textarea>
+    </div>
+  `).join('');
+  list.querySelectorAll('.del-row').forEach(btn=>{
+    btn.addEventListener('click', ()=> btn.closest('.manage-row').remove());
+  });
+}
+document.getElementById('writeMessageBtn').addEventListener('click', ()=>{
+  renderManageMessagesList();
+  document.getElementById('manageMessagesModal').classList.add('open');
+});
+document.getElementById('manageMessagesClose').addEventListener('click', ()=>{
+  document.getElementById('manageMessagesModal').classList.remove('open');
+});
+document.getElementById('manageMessagesModal').addEventListener('click', e=>{
+  if(e.target.id==='manageMessagesModal') document.getElementById('manageMessagesModal').classList.remove('open');
+});
+document.getElementById('manageMessagesSaveBtn').addEventListener('click', async ()=>{
+  const rows = Array.from(document.querySelectorAll('#manageMessagesList .manage-row'));
+  const updated = rows.map(r=>{
+    const id = r.dataset.id;
+    const existing = MESSAGES.find(m=>m.id===id);
+    return {
+      id,
+      subject: r.querySelector('.m-subject').value.trim() || 'A message',
+      body: r.querySelector('.m-body').value.trim(),
+      date: existing ? existing.date : new Date().toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'}),
+      read: existing ? existing.read : false
+    };
+  }).filter(m=>m.body);
+  const newSubject = document.getElementById('newMsgSubject').value.trim();
+  const newBody = document.getElementById('newMsgBody').value.trim();
+  if(newBody){
+    updated.push({
+      id: 'm'+Date.now().toString()+Math.random().toString(36).slice(2,7),
+      subject: newSubject || 'A message for you',
+      body: newBody,
+      date: new Date().toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'}),
+      read: false
+    });
+  }
+  await saveMessages(updated);
+  document.getElementById('newMsgSubject').value='';
+  document.getElementById('newMsgBody').value='';
+  renderManageMessagesList();
+  renderMessagesList();
+});
+document.getElementById('copyMsgSyncCodeBtn').addEventListener('click', async ()=>{
+  const code = 'RIRIMSG1:' + b64EncodeUtf8(JSON.stringify(MESSAGES));
+  const btn = document.getElementById('copyMsgSyncCodeBtn');
+  function done(ok){
+    btn.textContent = ok ? '✓ copied — now send it to her' : 'copy failed — select & copy manually';
+    setTimeout(()=>{ btn.textContent = '📋 copy sync code'; }, 2400);
+  }
+  try{
+    await navigator.clipboard.writeText(code);
+    done(true);
+  }catch(e){
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = code; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      done(true);
+    }catch(e2){ done(false); }
+  }
+});
+
+(async function initMessages(){
+  await loadMessages();
+  renderMessagesList();
+})();
+
+/* ---------------- JOURNAL ---------------- */
+let selectedMood = '🌸';
+document.querySelectorAll('.mood-chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    document.querySelectorAll('.mood-chip').forEach(c=>c.classList.remove('selected'));
+    chip.classList.add('selected');
+    selectedMood = chip.dataset.mood;
+  });
+});
+document.querySelector('.mood-chip').classList.add('selected');
+
+async function renderEntries(){
+  let entries = (await storeGet('riri-journal')) || [];
+  let needsMigration = false;
+  entries = entries.map(e=>{
+    if(!e.id){ needsMigration = true; return { ...e, id: Date.now().toString()+Math.random().toString(36).slice(2,7) }; }
+    return e;
+  });
+  if(needsMigration) await storeSet('riri-journal', entries);
+
+  const list = document.getElementById('entryList');
+  if(entries.length===0){ list.innerHTML = '<p class="empty">No entries yet — your first one is waiting. 🌸</p>'; return; }
+  list.innerHTML = entries.slice().reverse().map(e=>`
+    <div class="entry" data-id="${e.id}">
+      <div class="entry-head">
+        <span class="entry-date">${e.date}</span>
+        <span style="display:flex; align-items:center; gap:8px;">
+          <span class="entry-mood">${e.mood}</span>
+          <button class="entry-del" data-del="${e.id}" aria-label="Delete this entry" type="button">🗑</button>
+        </span>
+      </div>
+      <div class="entry-text">${e.text.replace(/</g,'&lt;')}</div>
+    </div>
+  `).join('');
+  list.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      if(!confirm('Delete this journal entry? This can\'t be undone.')) return;
+      let entries = (await storeGet('riri-journal')) || [];
+      entries = entries.filter(e=> e.id !== btn.dataset.del);
+      await storeSet('riri-journal', entries);
+      renderEntries();
+    });
+  });
+}
+document.getElementById('saveEntryBtn').addEventListener('click', async ()=>{
+  const text = document.getElementById('journalInput').value.trim();
+  if(!text) return;
+  const entries = (await storeGet('riri-journal')) || [];
+  entries.push({
+    id: Date.now().toString()+Math.random().toString(36).slice(2,7),
+    date: new Date().toLocaleString(undefined,{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}),
+    mood: selectedMood,
+    text
+  });
+  await storeSet('riri-journal', entries);
+  document.getElementById('journalInput').value='';
+  renderEntries();
+});
+renderEntries();
+
+/* ---------------- FLASHCARDS ---------------- */
+const defaultCards = [
+  {cat:'ELA', front:'Thesis statement', back:'A one/two sentence summary of the main point or argument of an essay.'},
+  {cat:'ELA', front:'Simile', back:'A comparison using "like" or "as" — e.g. "brave as a lion."'},
+  {cat:'ELA', front:'Theme', back:'The underlying message or big idea a piece of writing explores.'},
+  {cat:'ELA', front:'Inference', back:'A conclusion drawn from evidence and reasoning, not stated directly.'},
+  {cat:'Biology', front:'Homeostasis', back:"The body's process of keeping internal conditions stable and balanced."},
+  {cat:'Biology', front:'Mitochondria', back:'The organelle that produces ATP — the "powerhouse of the cell."'},
+  {cat:'Biology', front:'Osmosis', back:'Movement of water across a membrane from low to high solute concentration.'},
+  {cat:'Biology', front:'Homozygous', back:'Having two identical alleles for a given gene.'},
+];
+let fcState = { cat:'all', index:0, cards:[], ratings:{} };
+const rateEmoji = { hard:'😅', okay:'🙂', mastered:'✅' };
+
+function cardKey(c){ return c.cat+'|'+c.front; }
+
+async function loadFlashcards(){
+  const custom = (await storeGet('riri-flashcards-custom')) || [];
+  fcState.ratings = (await storeGet('riri-flashcards-ratings')) || {};
+  fcState.all = defaultCards.concat(custom);
+  applyFcFilter();
+}
+function applyFcFilter(){
+  if(fcState.cat==='all') fcState.cards = fcState.all;
+  else if(fcState.cat==='needsreview') fcState.cards = fcState.all.filter(c=>fcState.ratings[cardKey(c)]==='hard');
+  else fcState.cards = fcState.all.filter(c=>c.cat===fcState.cat);
+  fcState.index = 0;
+  renderFlashcard();
+}
+function renderFlashcard(){
+  const card = document.getElementById('flipCard');
+  card.classList.remove('flipped');
+  const c = fcState.cards[fcState.index];
+  document.querySelectorAll('.rate-btn').forEach(b=>b.classList.remove('active'));
+  if(!c){
+    document.getElementById('fcFrontText').textContent = 'No cards here yet';
+    document.getElementById('fcBackText').textContent = '';
+    document.getElementById('fcCount').textContent = '0 / 0';
+    document.getElementById('fcTagFront').textContent='';
+    document.getElementById('fcTagBack').textContent='';
+    document.getElementById('fcBadgeFront').textContent='';
+    return;
+  }
+  document.getElementById('fcFrontText').textContent = c.front;
+  document.getElementById('fcBackText').textContent = c.back;
+  document.getElementById('fcTagFront').textContent = c.cat;
+  document.getElementById('fcTagBack').textContent = c.cat;
+  document.getElementById('fcCount').textContent = (fcState.index+1)+' / '+fcState.cards.length;
+  const rating = fcState.ratings[cardKey(c)];
+  document.getElementById('fcBadgeFront').textContent = rating ? rateEmoji[rating] : '';
+  if(rating){
+    const map = {hard:'.rate-btn.hard', okay:'.rate-btn.okay', mastered:'.rate-btn.easy'};
+    const btn = document.querySelector(map[rating]);
+    if(btn) btn.classList.add('active');
+  }
+}
+document.getElementById('flipCard').addEventListener('click', function(){ this.classList.toggle('flipped'); });
+document.getElementById('fcPrev').addEventListener('click', ()=>{
+  if(fcState.cards.length===0) return;
+  fcState.index = (fcState.index-1+fcState.cards.length)%fcState.cards.length;
+  renderFlashcard();
+});
+document.getElementById('fcNext').addEventListener('click', ()=>{
+  if(fcState.cards.length===0) return;
+  fcState.index = (fcState.index+1)%fcState.cards.length;
+  renderFlashcard();
+});
+document.querySelectorAll('.rate-btn').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    const c = fcState.cards[fcState.index];
+    if(!c) return;
+    fcState.ratings[cardKey(c)] = btn.dataset.rate;
+    await storeSet('riri-flashcards-ratings', fcState.ratings);
+    renderFlashcard();
+  });
+});
+document.querySelectorAll('#fcFilters .chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    document.querySelectorAll('#fcFilters .chip').forEach(c=>c.classList.remove('selected'));
+    chip.classList.add('selected');
+    fcState.cat = chip.dataset.cat;
+    applyFcFilter();
+  });
+});
+document.getElementById('addCardBtn').addEventListener('click', async ()=>{
+  const cat = document.getElementById('newCat').value;
+  const front = document.getElementById('newFront').value.trim();
+  const back = document.getElementById('newBack').value.trim();
+  if(!front || !back) return;
+  const custom = (await storeGet('riri-flashcards-custom')) || [];
+  custom.push({cat, front, back});
+  await storeSet('riri-flashcards-custom', custom);
+  document.getElementById('newFront').value='';
+  document.getElementById('newBack').value='';
+  loadFlashcards();
+});
+loadFlashcards();
+
+/* ---------------- NOTEBOOK ---------------- */
+let editingNoteId = null;
+document.getElementById('newNoteBtn').addEventListener('click', ()=>{
+  editingNoteId = null;
+  document.getElementById('noteTitle').value='';
+  document.getElementById('noteBody').value='';
+  document.getElementById('editorBox').classList.add('active');
+});
+document.getElementById('cancelNoteBtn').addEventListener('click', ()=>{
+  document.getElementById('editorBox').classList.remove('active');
+});
+document.getElementById('saveNoteBtn').addEventListener('click', async ()=>{
+  const title = document.getElementById('noteTitle').value.trim() || 'Untitled';
+  const body = document.getElementById('noteBody').value.trim();
+  const notes = (await storeGet('riri-notebook')) || [];
+  if(editingNoteId){
+    const n = notes.find(x=>x.id===editingNoteId);
+    if(n){ n.title=title; n.body=body; }
+  } else {
+    notes.push({id: Date.now().toString(), title, body});
+  }
+  await storeSet('riri-notebook', notes);
+  document.getElementById('editorBox').classList.remove('active');
+  renderNotebook();
+});
+async function renderNotebook(){
+  const notes = (await storeGet('riri-notebook')) || [];
+  const grid = document.getElementById('notebookGrid');
+  if(notes.length===0){ grid.innerHTML = '<p class="empty">No sticky notes yet.</p>'; return; }
+  grid.innerHTML = notes.map(n=>`
+    <div class="sticky" data-id="${n.id}">
+      <h4>${n.title.replace(/</g,'&lt;')}</h4>
+      <p>${n.body.replace(/</g,'&lt;')}</p>
+      <button class="del" data-del="${n.id}">delete</button>
+    </div>
+  `).join('');
+  grid.querySelectorAll('.sticky').forEach(card=>{
+    card.addEventListener('click', (e)=>{
+      if(e.target.dataset.del) return;
+      const id = card.dataset.id;
+      storeGet('riri-notebook').then(notes=>{
+        const n = (notes||[]).find(x=>x.id===id);
+        if(!n) return;
+        editingNoteId = id;
+        document.getElementById('noteTitle').value = n.title;
+        document.getElementById('noteBody').value = n.body;
+        document.getElementById('editorBox').classList.add('active');
+      });
+    });
+  });
+  grid.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      e.stopPropagation();
+      const id = btn.dataset.del;
+      let notes = (await storeGet('riri-notebook')) || [];
+      notes = notes.filter(n=>n.id!==id);
+      await storeSet('riri-notebook', notes);
+      renderNotebook();
+    });
+  });
+}
+renderNotebook();
+
+/* ---------------- QUIZ ---------------- */
+const quizBank = [
+  {q:"Which word is a synonym for 'concise'?", opts:["Brief","Lengthy","Vague","Loud"], a:0, exp:"Concise means expressing a lot using few words — 'brief' is the closest match."},
+  {q:"In a well-structured essay, the thesis statement usually appears in the:", opts:["Conclusion only","Introduction","Middle of body paragraph 2","Footnotes"], a:1, exp:"The thesis sets up the argument, so it belongs early — typically the end of the intro."},
+  {q:"'The wind whispered through the trees' is an example of:", opts:["Simile","Personification","Alliteration","Hyperbole"], a:1, exp:"Giving the wind a human action ('whispered') is personification."},
+  {q:"Which organelle is responsible for producing energy (ATP) in a cell?", opts:["Nucleus","Ribosome","Mitochondria","Golgi apparatus"], a:2, exp:"Mitochondria convert nutrients into ATP — the cell's usable energy."},
+  {q:"Homeostasis refers to the body's ability to:", opts:["Grow rapidly","Maintain a stable internal environment","Fight infection only","Digest food"], a:1, exp:"Homeostasis is about keeping internal conditions (temp, pH, etc.) balanced."},
+  {q:"Osmosis is the movement of:", opts:["Proteins across a membrane","Water across a membrane","Oxygen into blood only","Glucose into muscle only"], a:1, exp:"Osmosis specifically describes water moving toward higher solute concentration."},
+  {q:"An organism that is homozygous for a trait has:", opts:["Two different alleles","One allele only","Two identical alleles","No alleles"], a:2, exp:"'Homo-' means same — homozygous means both alleles for that gene match."},
+  {q:"Which sentence uses active voice?", opts:["The report was written by Sam.","Sam wrote the report.","The report had been written.","Writing was done by Sam."], a:1, exp:"In active voice, the subject (Sam) performs the action directly."},
+];
+let quizState = { order: [], i:0, score:0 };
+
+document.getElementById('startQuizBtn').addEventListener('click', startQuiz);
+document.getElementById('retakeBtn').addEventListener('click', startQuiz);
+
+function startQuiz(){
+  quizState.order = quizBank.map((_,i)=>i).sort(()=>Math.random()-.5);
+  quizState.i = 0; quizState.score = 0;
+  document.getElementById('quizIntro').style.display='none';
+  document.getElementById('quizScore').style.display='none';
+  document.getElementById('quizBody').style.display='block';
+  showQuestion();
+}
+function showQuestion(){
+  const qi = quizState.order[quizState.i];
+  const q = quizBank[qi];
+  document.getElementById('qCount').textContent = `Question ${quizState.i+1} of ${quizState.order.length}`;
+  document.getElementById('progressFill').style.width = ((quizState.i)/quizState.order.length*100)+'%';
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('qExplain').classList.remove('show');
+  const optWrap = document.getElementById('qOptions');
+  optWrap.innerHTML = '';
+  q.opts.forEach((opt, idx)=>{
+    const b = document.createElement('button');
+    b.className='opt';
+    b.textContent = opt;
+    b.addEventListener('click', ()=>selectAnswer(idx, q, b, optWrap));
+    optWrap.appendChild(b);
+  });
+}
+function selectAnswer(idx, q, btn, wrap){
+  const buttons = wrap.querySelectorAll('.opt');
+  buttons.forEach(b=>b.disabled=true);
+  if(idx===q.a){ btn.classList.add('correct'); quizState.score++; }
+  else {
+    btn.classList.add('wrong');
+    buttons[q.a].classList.add('correct');
+  }
+  const exp = document.getElementById('qExplain');
+  exp.textContent = q.exp;
+  exp.classList.add('show');
+  setTimeout(()=>{
+    quizState.i++;
+    if(quizState.i < quizState.order.length){ showQuestion(); }
+    else { finishQuiz(); }
+  }, 1500);
+}
+function launchConfetti(){
+  const layer = document.getElementById('confettiLayer');
+  const bits = ['🎉','✨','🌸','💗','🌟','🩷'];
+  for(let i=0;i<24;i++){
+    const s = document.createElement('span');
+    s.className='confetti-bit';
+    s.textContent = bits[Math.floor(Math.random()*bits.length)];
+    s.style.left = (Math.random()*100)+'%';
+    s.style.animationDelay = (Math.random()*.4)+'s';
+    layer.appendChild(s);
+    setTimeout(()=>s.remove(), 2200);
+  }
+}
+async function finishQuiz(){
+  document.getElementById('progressFill').style.width='100%';
+  document.getElementById('quizBody').style.display='none';
+  document.getElementById('quizScore').style.display='block';
+  const pct = Math.round(quizState.score/quizState.order.length*100);
+  document.getElementById('scoreBig').textContent = quizState.score+' / '+quizState.order.length;
+  const msgs = pct===100? "Perfect score, My Riri. That's it, that's the nurse energy. 🩺💗" :
+    pct>=70? "So close to perfect — you clearly know this. 🌸" :
+    pct>=40? "Solid start — a couple more passes and this is locked in. 🌷" :
+    "That's what review is for. Go again whenever you're ready. 💗";
+  document.getElementById('scoreMsg').textContent = msgs;
+  if(pct===100) launchConfetti();
+  const best = (await storeGet('riri-quiz-best')) || 0;
+  if(quizState.score > best){ await storeSet('riri-quiz-best', quizState.score); }
+}
+</script>
+</body>
+</html>
