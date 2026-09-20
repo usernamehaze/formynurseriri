@@ -308,7 +308,14 @@ window.__fmrReady = Promise.race([
   }
   .admin-only{ display:none !important; }
   html.is-admin .admin-only{ display:inline-block !important; }
+  html.is-admin .riri-only{ display:none !important; }
   .manage-link:hover{ opacity:1; color:var(--pink-deep); }
+  .comment-note{ background:var(--lavender); border-radius:10px; padding:8px 12px; font-size:12.5px; color:#4A1525; margin-top:8px; font-weight:600; line-height:1.4; }
+  .comment-btn{
+    border:none; background:rgba(255,255,255,.6); border-radius:8px; padding:3px 8px; cursor:pointer;
+    color:var(--pink-deep); font-weight:700; font-size:11px; opacity:.75;
+  }
+  .comment-btn:hover{ opacity:1; background:#FFE1E9; }
 
   .jar-modal{
     display:none; position:fixed; inset:0; z-index:50; background:rgba(74,21,37,.42);
@@ -764,6 +771,7 @@ window.__fmrReady = Promise.race([
         <div id="messagesList"></div>
         <div style="margin-top:18px; text-align:center;">
           <button class="manage-link admin-only" id="writeMessageBtn" type="button">✎ write a new message</button>
+          <button class="manage-link riri-only" id="composeToHazeBtn" type="button">✎ send Haze a message</button>
         </div>
       </div>
     </section>
@@ -789,6 +797,29 @@ window.__fmrReady = Promise.race([
         </div>
         <div style="margin-top:18px; text-align:right;">
           <button class="btn" id="manageMessagesSaveBtn">Save messages</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="jar-modal" id="composeModal">
+      <div class="jar-modal-inner">
+        <button class="jar-close" id="composeClose" aria-label="Close compose">✕</button>
+        <h3>send Haze a message</h3>
+        <div class="manage-row"><input type="text" id="composeSubject" placeholder="Subject (optional)"></div>
+        <div class="manage-row"><textarea id="composeBody" rows="6" placeholder="Write what's on your mind..."></textarea></div>
+        <div style="margin-top:18px; text-align:right;">
+          <button class="btn" id="composeSendBtn">Send 💌</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="jar-modal" id="commentModal">
+      <div class="jar-modal-inner">
+        <button class="jar-close" id="commentClose" aria-label="Close comment">✕</button>
+        <h3>💬 leave a little comment</h3>
+        <div class="manage-row"><textarea id="commentText" rows="4" placeholder="Add a note she'll see..."></textarea></div>
+        <div style="margin-top:18px; text-align:right;">
+          <button class="btn" id="commentSaveBtn">Save comment</button>
         </div>
       </div>
     </div>
@@ -826,22 +857,25 @@ window.__fmrReady = Promise.race([
             <div class="tape tape-1"></div>
             <h3 class="spread-greeting"><span class="bow-ic"></span> hello, today!</h3>
             <p class="spread-date" id="journalDate"></p>
-            <textarea id="journalInput" rows="6" placeholder="Another new day, another chance to..."></textarea>
+            <div class="riri-only">
+              <textarea id="journalInput" rows="6" placeholder="Another new day, another chance to..."></textarea>
 
-            <div class="feel-card">
-              <p class="feel-title">today I'm feeling</p>
-              <div class="mood-row" id="moodRow">
-                <span class="mood-chip" data-mood="🌸">soft</span>
-                <span class="mood-chip" data-mood="💪">focused</span>
-                <span class="mood-chip" data-mood="😮‍💨">tired</span>
-                <span class="mood-chip" data-mood="🥹">emotional</span>
-                <span class="mood-chip" data-mood="🎉">proud</span>
+              <div class="feel-card">
+                <p class="feel-title">today I'm feeling</p>
+                <div class="mood-row" id="moodRow">
+                  <span class="mood-chip" data-mood="🌸">soft</span>
+                  <span class="mood-chip" data-mood="💪">focused</span>
+                  <span class="mood-chip" data-mood="😮‍💨">tired</span>
+                  <span class="mood-chip" data-mood="🥹">emotional</span>
+                  <span class="mood-chip" data-mood="🎉">proud</span>
+                </div>
+              </div>
+
+              <div style="margin-top:14px; text-align:right;">
+                <button class="btn" id="saveEntryBtn">save today's page 💗</button>
               </div>
             </div>
-
-            <div style="margin-top:14px; text-align:right;">
-              <button class="btn" id="saveEntryBtn">save today's page 💗</button>
-            </div>
+            <p class="admin-only" style="font-size:13px; color:var(--ink-soft); font-weight:700;">📖 You're viewing Riri's journal. You can leave her a comment on any entry.</p>
           </div>
 
           <div class="page-right">
@@ -872,14 +906,18 @@ window.__fmrReady = Promise.race([
             <button class="rate-btn okay" data-rate="okay">🙂 Okay</button>
             <button class="rate-btn easy" data-rate="mastered">✅ Mastered</button>
           </div>
-          <button class="btn ghost small" id="fcDeleteBtn">🗑 Delete this card</button>
+          <p class="comment-note" id="fcCommentText" style="display:none;"></p>
+          <div style="display:flex; gap:10px;">
+            <button class="btn ghost small riri-only" id="fcDeleteBtn">🗑 Delete this card</button>
+            <button class="btn ghost small admin-only" id="fcCommentBtn">💬 Comment</button>
+          </div>
           <div class="fc-nav">
             <button class="btn ghost small" id="fcPrev">← Prev</button>
             <span class="fc-count" id="fcCount">1 / 1</span>
             <button class="btn ghost small" id="fcNext">Next →</button>
           </div>
         </div>
-        <div class="add-card-form">
+        <div class="add-card-form riri-only">
           <h2 class="page-title" style="font-size:17px;">➕ Add your own card</h2>
           <div class="form-row">
             <input type="text" id="newCat" list="fcSubjectList" placeholder="Subject (e.g. Biology)">
@@ -900,8 +938,9 @@ window.__fmrReady = Promise.race([
     <section class="page" id="page-notebook">
       <div class="card">
         <h2 class="page-title">🗒️ Notebook</h2>
-        <p class="lead">Sticky notes for formulas, vocab lists, or reminders. Click a note to edit it.</p>
-        <button class="btn" id="newNoteBtn" style="margin-bottom:16px;">➕ New sticky note</button>
+        <p class="lead riri-only">Sticky notes for formulas, vocab lists, or reminders. Click a note to edit it.</p>
+        <p class="lead admin-only">Riri's sticky notes. You can leave a comment on any of them.</p>
+        <button class="btn riri-only" id="newNoteBtn" style="margin-bottom:16px;">➕ New sticky note</button>
         <div id="editorBox" class="editor">
           <input type="text" id="noteTitle" placeholder="Title" style="margin-bottom:10px;">
           <textarea id="noteBody" rows="5" placeholder="Write your note..."></textarea>
@@ -918,7 +957,7 @@ window.__fmrReady = Promise.race([
     <section class="page" id="page-quiz">
       <div class="card">
         <h2 class="page-title">🧠 Quiz time</h2>
-        <p class="lead">A quick mix of ELA and Biology gap-year review questions. Retake anytime.</p>
+        <p class="lead">A quick mix of ELA and Biology review questions. Retake anytime.</p>
         <div id="quizIntro">
           <button class="btn" id="startQuizBtn">Start quiz 🌸</button>
         </div>
@@ -1402,6 +1441,7 @@ const DEFAULT_MESSAGES = [
   {
     id: 'seed-monthsary',
     subject: '🎉 Happy Monthsary',
+    from: 'haze',
     date: new Date().toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'}),
     body: "My Wife,\n\nHappy Monthsary! Another month passed, all the laughters and tears we shed. The easy and busy days we had.\n\nAlways remember that, you will always be the person who I would randomly think of in my busiest time. You will always be the person I run to whenever I want someone to talk to. You will always be that person, I love every tick of the clock. You will always be in every beat of my heart. I will always appreciate all the kind words, the silly jokes you pull, it keeps me going my love. You will always be my kindest and good girl. I will always support you no matter what track you go, what career you pursue and what passion you play. You will always always have me, from behind and from your side holding your hands. I will always raise you, flex you and make sure you're in the stand, hoping you will not see me less. I hope you will see me as your partner on every step and phase of our life. I'm sure of you, and I'm sure of our relationship and the future that this will bring. I hope that no matter the situation is we will always choose each other and stay together. We will choose to lower down our pride and ego, we choose to understand every perspective of each other and we choose to calm down and communicate during the fight and misunderstanding. I wanna see us together in the future and moving forward.\n\nI will always love you with all my heart, Ri."
   }
@@ -1474,9 +1514,9 @@ function renderMessagesList(){
     <div class="envelope" data-id="${escapeAttr(m.id)}" tabindex="0" role="button" aria-label="Open message: ${escapeAttr(m.subject)}">
       <div class="envelope-flap"></div>
       ${!isMessageRead(m.id) ? '<span class="envelope-new">new</span>' : ''}
-      <div class="envelope-seal">💗</div>
+      <div class="envelope-seal">${m.from==='riri' ? '🌸' : '💗'}</div>
       <p class="envelope-subject">${escapeHtml(m.subject)}</p>
-      <p class="envelope-date">${escapeHtml(m.date)}</p>
+      <p class="envelope-date">${escapeHtml(m.date)} · ${m.from==='riri' ? 'from Riri' : 'from Haze'}</p>
     </div>
   `).join('') + '</div>';
   wrap.querySelectorAll('.envelope').forEach(el=>{
@@ -1490,7 +1530,7 @@ async function openMessage(id){
   const msg = MESSAGES.find(m=>m.id===id);
   if(!msg) return;
   document.getElementById('msgReadSubject').textContent = msg.subject;
-  document.getElementById('msgReadDate').textContent = msg.date;
+  document.getElementById('msgReadDate').textContent = msg.date + ' · ' + (msg.from==='riri' ? 'from Riri' : 'from Haze');
   document.getElementById('msgReadBody').innerHTML = msg.body.split('\n\n').map(p=>`<p>${escapeHtml(p)}</p>`).join('');
   document.getElementById('messageReadModal').classList.add('open');
   if(!isMessageRead(id)){
@@ -1509,8 +1549,9 @@ document.getElementById('messageReadModal').addEventListener('click', e=>{
 function renderManageMessagesList(){
   const list = document.getElementById('manageMessagesList');
   list.innerHTML = MESSAGES.map(m=>`
-    <div class="manage-row" data-id="${escapeAttr(m.id)}" style="flex-direction:column; align-items:stretch; border-bottom:2px dashed var(--pink-soft); padding-bottom:12px;">
-      <div style="display:flex; gap:8px;">
+    <div class="manage-row" data-id="${escapeAttr(m.id)}" data-from="${escapeAttr(m.from||'haze')}" style="flex-direction:column; align-items:stretch; border-bottom:2px dashed var(--pink-soft); padding-bottom:12px;">
+      <div style="display:flex; gap:8px; align-items:center;">
+        <span style="font-size:11.5px; font-weight:800; color:var(--ink-soft); white-space:nowrap;">${m.from==='riri' ? '🌸 Riri' : '💗 Haze'}</span>
         <input type="text" class="m-subject" value="${escapeAttr(m.subject)}" placeholder="Subject">
         <button type="button" class="del-row" aria-label="Delete">✕</button>
       </div>
@@ -1540,6 +1581,7 @@ document.getElementById('manageMessagesSaveBtn').addEventListener('click', async
       id,
       subject: r.querySelector('.m-subject').value.trim() || 'A message',
       body: r.querySelector('.m-body').value.trim(),
+      from: r.dataset.from || 'haze',
       date: existing ? existing.date : new Date().toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'})
     };
   }).filter(m=>m.body);
@@ -1550,6 +1592,7 @@ document.getElementById('manageMessagesSaveBtn').addEventListener('click', async
       id: 'm'+Date.now().toString()+Math.random().toString(36).slice(2,7),
       subject: newSubject || 'A message for you',
       body: newBody,
+      from: 'haze',
       date: new Date().toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'})
     });
   }
@@ -1560,6 +1603,55 @@ document.getElementById('manageMessagesSaveBtn').addEventListener('click', async
   renderMessagesList();
 });
 
+document.getElementById('composeToHazeBtn').addEventListener('click', ()=>{
+  document.getElementById('composeSubject').value='';
+  document.getElementById('composeBody').value='';
+  document.getElementById('composeModal').classList.add('open');
+});
+document.getElementById('composeClose').addEventListener('click', ()=>{
+  document.getElementById('composeModal').classList.remove('open');
+});
+document.getElementById('composeModal').addEventListener('click', e=>{
+  if(e.target.id==='composeModal') document.getElementById('composeModal').classList.remove('open');
+});
+document.getElementById('composeSendBtn').addEventListener('click', async ()=>{
+  const subject = document.getElementById('composeSubject').value.trim() || 'A message for you';
+  const body = document.getElementById('composeBody').value.trim();
+  if(!body) return;
+  const msg = {
+    id: 'r'+Date.now().toString()+Math.random().toString(36).slice(2,7),
+    subject,
+    body,
+    from: 'riri',
+    date: new Date().toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'})
+  };
+  await saveMessages(MESSAGES.concat([msg]));
+  document.getElementById('composeSubject').value='';
+  document.getElementById('composeBody').value='';
+  document.getElementById('composeModal').classList.remove('open');
+  renderMessagesList();
+});
+
+/* ---- shared comment modal (admin can leave a comment on her flashcards / notebook / journal) ---- */
+let commentSaveHandler = null;
+function openCommentModal(currentText, onSave){
+  document.getElementById('commentText').value = currentText || '';
+  commentSaveHandler = onSave;
+  document.getElementById('commentModal').classList.add('open');
+}
+document.getElementById('commentClose').addEventListener('click', ()=>{
+  document.getElementById('commentModal').classList.remove('open');
+});
+document.getElementById('commentModal').addEventListener('click', e=>{
+  if(e.target.id==='commentModal') document.getElementById('commentModal').classList.remove('open');
+});
+document.getElementById('commentSaveBtn').addEventListener('click', async ()=>{
+  const text = document.getElementById('commentText').value.trim();
+  const handler = commentSaveHandler;
+  document.getElementById('commentModal').classList.remove('open');
+  if(handler) await handler(text);
+});
+
 (async function initMessages(){
   await loadReadIds();
   await loadMessages();
@@ -1567,6 +1659,7 @@ document.getElementById('manageMessagesSaveBtn').addEventListener('click', async
 })();
 
 /* ---------------- JOURNAL ---------------- */
+let JOURNAL = [];
 let selectedMood = '🌸';
 document.querySelectorAll('.mood-chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{
@@ -1577,54 +1670,102 @@ document.querySelectorAll('.mood-chip').forEach(chip=>{
 });
 document.querySelector('.mood-chip').classList.add('selected');
 
-async function renderEntries(){
-  let entries = (await storeGet('riri-journal')) || [];
-  let needsMigration = false;
-  entries = entries.map(e=>{
-    if(!e.id){ needsMigration = true; return { ...e, id: Date.now().toString()+Math.random().toString(36).slice(2,7) }; }
-    return e;
-  });
-  if(needsMigration) await storeSet('riri-journal', entries);
-
+function migrateJournalIds(entries){
+  return entries.map(e=> e.id ? e : { ...e, id: Date.now().toString()+Math.random().toString(36).slice(2,7) });
+}
+async function loadJournal(){
+  const fmr = await window.__fmrReady;
+  if(!fmr){
+    JOURNAL = migrateJournalIds((await storeGet('riri-journal')) || []);
+    renderEntries();
+    return;
+  }
+  const ref = fmr.doc(fmr.db, 'jarData', 'journal');
+  let stored = null;
+  try{
+    const snap = await fmr.getDoc(ref);
+    if(snap.exists()){
+      stored = snap.data().list || [];
+      if(stored.length===0){
+        const local = migrateJournalIds((await storeGet('riri-journal')) || []);
+        if(local.length>0){ stored = local; await fmr.setDoc(ref, { list: stored }); }
+      }
+    } else{
+      stored = migrateJournalIds((await storeGet('riri-journal')) || []);
+      await fmr.setDoc(ref, { list: stored });
+    }
+  }catch(e){
+    console.error('journal load failed, using local', e);
+    stored = migrateJournalIds((await storeGet('riri-journal')) || []);
+  }
+  JOURNAL = stored;
+  renderEntries();
+  try{
+    fmr.onSnapshot(ref, function(snap){
+      if(!snap.exists()) return;
+      JOURNAL = snap.data().list || [];
+      renderEntries();
+    });
+  }catch(e){ console.error(e); }
+}
+async function saveJournal(list){
+  JOURNAL = list;
+  const fmr = await window.__fmrReady;
+  if(!fmr){ await storeSet('riri-journal', list); return; }
+  const ref = fmr.doc(fmr.db, 'jarData', 'journal');
+  try{ await fmr.setDoc(ref, { list: list }); }
+  catch(e){ console.error('journal save failed', e); }
+}
+function renderEntries(){
   const list = document.getElementById('entryList');
-  if(entries.length===0){ list.innerHTML = '<p class="empty">No entries yet — your first one is waiting. 🌸</p>'; return; }
-  list.innerHTML = entries.slice().reverse().map(e=>`
+  if(JOURNAL.length===0){ list.innerHTML = '<p class="empty">No entries yet — your first one is waiting. 🌸</p>'; return; }
+  list.innerHTML = JOURNAL.slice().reverse().map(e=>`
     <div class="entry" data-id="${e.id}">
       <div class="entry-head">
         <span class="entry-date">${e.date}</span>
         <span style="display:flex; align-items:center; gap:8px;">
           <span class="entry-mood">${e.mood}</span>
-          <button class="entry-del" data-del="${e.id}" aria-label="Delete this entry" type="button">🗑</button>
+          <button class="entry-del admin-only" data-comment="${e.id}" aria-label="Comment on this entry" type="button">💬</button>
+          <button class="entry-del riri-only" data-del="${e.id}" aria-label="Delete this entry" type="button">🗑</button>
         </span>
       </div>
-      <div class="entry-text">${e.text.replace(/</g,'&lt;')}</div>
+      <div class="entry-text">${escapeHtml(e.text)}</div>
+      ${e.comment ? `<p class="comment-note">💬 ${escapeHtml(e.comment)}</p>` : ''}
     </div>
   `).join('');
   list.querySelectorAll('[data-del]').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       if(!confirm('Delete this journal entry? This can\'t be undone.')) return;
-      let entries = (await storeGet('riri-journal')) || [];
-      entries = entries.filter(e=> e.id !== btn.dataset.del);
-      await storeSet('riri-journal', entries);
+      await saveJournal(JOURNAL.filter(e=> e.id !== btn.dataset.del));
       renderEntries();
+    });
+  });
+  list.querySelectorAll('[data-comment]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.dataset.comment;
+      const entry = JOURNAL.find(e=>e.id===id);
+      if(!entry) return;
+      openCommentModal(entry.comment, async (text)=>{
+        await saveJournal(JOURNAL.map(e=> e.id===id ? {...e, comment:text} : e));
+        renderEntries();
+      });
     });
   });
 }
 document.getElementById('saveEntryBtn').addEventListener('click', async ()=>{
   const text = document.getElementById('journalInput').value.trim();
   if(!text) return;
-  const entries = (await storeGet('riri-journal')) || [];
-  entries.push({
+  const entries = JOURNAL.concat([{
     id: Date.now().toString()+Math.random().toString(36).slice(2,7),
     date: new Date().toLocaleString(undefined,{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}),
     mood: selectedMood,
     text
-  });
-  await storeSet('riri-journal', entries);
+  }]);
+  await saveJournal(entries);
   document.getElementById('journalInput').value='';
   renderEntries();
 });
-renderEntries();
+loadJournal();
 
 /* ---------------- FLASHCARDS ---------------- */
 let fcState = { cat:'all', index:0, cards:[], all:[], ratings:{} };
@@ -1633,11 +1774,48 @@ const rateEmoji = { hard:'😅', okay:'🙂', mastered:'✅' };
 function cardKey(c){ return c.cat+'|'+c.front; }
 
 async function loadFlashcards(){
-  fcState.all = (await storeGet('riri-flashcards-custom')) || [];
   fcState.ratings = (await storeGet('riri-flashcards-ratings')) || {};
-  renderFcFilters();
-  renderFcSubjectList();
-  applyFcFilter();
+  const fmr = await window.__fmrReady;
+  if(!fmr){
+    fcState.all = (await storeGet('riri-flashcards-custom')) || [];
+    renderFcFilters(); renderFcSubjectList(); applyFcFilter();
+    return;
+  }
+  const ref = fmr.doc(fmr.db, 'jarData', 'flashcards');
+  let stored = null;
+  try{
+    const snap = await fmr.getDoc(ref);
+    if(snap.exists()){
+      stored = snap.data().list || [];
+      if(stored.length===0){
+        const local = (await storeGet('riri-flashcards-custom')) || [];
+        if(local.length>0){ stored = local; await fmr.setDoc(ref, { list: stored }); }
+      }
+    } else{
+      stored = (await storeGet('riri-flashcards-custom')) || [];
+      await fmr.setDoc(ref, { list: stored });
+    }
+  }catch(e){
+    console.error('flashcards load failed, using local', e);
+    stored = (await storeGet('riri-flashcards-custom')) || [];
+  }
+  fcState.all = stored;
+  renderFcFilters(); renderFcSubjectList(); applyFcFilter();
+  try{
+    fmr.onSnapshot(ref, function(snap){
+      if(!snap.exists()) return;
+      fcState.all = snap.data().list || [];
+      renderFcFilters(); renderFcSubjectList(); applyFcFilter(true);
+    });
+  }catch(e){ console.error(e); }
+}
+async function saveFlashcards(list){
+  fcState.all = list;
+  const fmr = await window.__fmrReady;
+  if(!fmr){ await storeSet('riri-flashcards-custom', list); return; }
+  const ref = fmr.doc(fmr.db, 'jarData', 'flashcards');
+  try{ await fmr.setDoc(ref, { list: list }); }
+  catch(e){ console.error('flashcards save failed', e); }
 }
 function renderFcFilters(){
   const filters = document.getElementById('fcFilters');
@@ -1660,11 +1838,17 @@ function renderFcSubjectList(){
   const cats = Array.from(new Set(fcState.all.map(c=>c.cat))).sort();
   document.getElementById('fcSubjectList').innerHTML = cats.map(cat=>`<option value="${escapeAttr(cat)}">`).join('');
 }
-function applyFcFilter(){
+function applyFcFilter(preserveIndex){
+  const prevKey = preserveIndex && fcState.cards[fcState.index] ? cardKey(fcState.cards[fcState.index]) : null;
   if(fcState.cat==='all') fcState.cards = fcState.all;
   else if(fcState.cat==='needsreview') fcState.cards = fcState.all.filter(c=>fcState.ratings[cardKey(c)]==='hard');
   else fcState.cards = fcState.all.filter(c=>c.cat===fcState.cat);
-  fcState.index = 0;
+  if(prevKey){
+    const idx = fcState.cards.findIndex(c=>cardKey(c)===prevKey);
+    fcState.index = idx>-1 ? idx : 0;
+  } else {
+    fcState.index = 0;
+  }
   renderFlashcard();
 }
 function renderFlashcard(){
@@ -1673,6 +1857,8 @@ function renderFlashcard(){
   const c = fcState.cards[fcState.index];
   document.querySelectorAll('.rate-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('fcDeleteBtn').style.display = c ? '' : 'none';
+  document.getElementById('fcCommentBtn').style.display = c ? '' : 'none';
+  const commentEl = document.getElementById('fcCommentText');
   if(!c){
     document.getElementById('fcFrontText').textContent = fcState.all.length===0 ? 'No cards yet — add your first one below!' : 'No cards here yet';
     document.getElementById('fcBackText').textContent = '';
@@ -1680,6 +1866,7 @@ function renderFlashcard(){
     document.getElementById('fcTagFront').textContent='';
     document.getElementById('fcTagBack').textContent='';
     document.getElementById('fcBadgeFront').textContent='';
+    commentEl.style.display='none';
     return;
   }
   document.getElementById('fcFrontText').textContent = c.front;
@@ -1687,6 +1874,8 @@ function renderFlashcard(){
   document.getElementById('fcTagFront').textContent = c.cat;
   document.getElementById('fcTagBack').textContent = c.cat;
   document.getElementById('fcCount').textContent = (fcState.index+1)+' / '+fcState.cards.length;
+  if(c.comment){ commentEl.textContent = '💬 ' + c.comment; commentEl.style.display=''; }
+  else{ commentEl.style.display='none'; }
   const rating = fcState.ratings[cardKey(c)];
   document.getElementById('fcBadgeFront').textContent = rating ? rateEmoji[rating] : '';
   if(rating){
@@ -1719,31 +1908,83 @@ document.getElementById('fcDeleteBtn').addEventListener('click', async ()=>{
   const c = fcState.cards[fcState.index];
   if(!c) return;
   if(!confirm('Delete this flashcard? This can\'t be undone.')) return;
-  const custom = (await storeGet('riri-flashcards-custom')) || [];
-  const idx = custom.findIndex(x=>cardKey(x)===cardKey(c));
-  if(idx>-1) custom.splice(idx,1);
-  await storeSet('riri-flashcards-custom', custom);
+  const updated = fcState.all.filter(x=>cardKey(x)!==cardKey(c));
+  await saveFlashcards(updated);
   delete fcState.ratings[cardKey(c)];
   await storeSet('riri-flashcards-ratings', fcState.ratings);
-  loadFlashcards();
+  renderFcFilters(); renderFcSubjectList(); applyFcFilter();
+});
+document.getElementById('fcCommentBtn').addEventListener('click', ()=>{
+  const c = fcState.cards[fcState.index];
+  if(!c) return;
+  openCommentModal(c.comment, async (text)=>{
+    const updated = fcState.all.map(x=> cardKey(x)===cardKey(c) ? {...x, comment:text} : x);
+    await saveFlashcards(updated);
+    renderFcFilters(); renderFcSubjectList(); applyFcFilter(true);
+  });
 });
 document.getElementById('addCardBtn').addEventListener('click', async ()=>{
   const cat = document.getElementById('newCat').value.trim();
   const front = document.getElementById('newFront').value.trim();
   const back = document.getElementById('newBack').value.trim();
   if(!cat || !front || !back) return;
-  const custom = (await storeGet('riri-flashcards-custom')) || [];
-  custom.push({cat, front, back});
-  await storeSet('riri-flashcards-custom', custom);
+  const updated = fcState.all.concat([{cat, front, back}]);
+  await saveFlashcards(updated);
   document.getElementById('newCat').value='';
   document.getElementById('newFront').value='';
   document.getElementById('newBack').value='';
-  loadFlashcards();
+  renderFcFilters(); renderFcSubjectList(); applyFcFilter();
 });
 loadFlashcards();
 
 /* ---------------- NOTEBOOK ---------------- */
+let NOTEBOOK = [];
 let editingNoteId = null;
+const isAdminView = document.documentElement.classList.contains('is-admin');
+
+async function loadNotebook(){
+  const fmr = await window.__fmrReady;
+  if(!fmr){
+    NOTEBOOK = (await storeGet('riri-notebook')) || [];
+    renderNotebook();
+    return;
+  }
+  const ref = fmr.doc(fmr.db, 'jarData', 'notebook');
+  let stored = null;
+  try{
+    const snap = await fmr.getDoc(ref);
+    if(snap.exists()){
+      stored = snap.data().list || [];
+      if(stored.length===0){
+        const local = (await storeGet('riri-notebook')) || [];
+        if(local.length>0){ stored = local; await fmr.setDoc(ref, { list: stored }); }
+      }
+    } else{
+      stored = (await storeGet('riri-notebook')) || [];
+      await fmr.setDoc(ref, { list: stored });
+    }
+  }catch(e){
+    console.error('notebook load failed, using local', e);
+    stored = (await storeGet('riri-notebook')) || [];
+  }
+  NOTEBOOK = stored;
+  renderNotebook();
+  try{
+    fmr.onSnapshot(ref, function(snap){
+      if(!snap.exists()) return;
+      NOTEBOOK = snap.data().list || [];
+      renderNotebook();
+    });
+  }catch(e){ console.error(e); }
+}
+async function saveNotebook(list){
+  NOTEBOOK = list;
+  const fmr = await window.__fmrReady;
+  if(!fmr){ await storeSet('riri-notebook', list); return; }
+  const ref = fmr.doc(fmr.db, 'jarData', 'notebook');
+  try{ await fmr.setDoc(ref, { list: list }); }
+  catch(e){ console.error('notebook save failed', e); }
+}
 document.getElementById('newNoteBtn').addEventListener('click', ()=>{
   editingNoteId = null;
   document.getElementById('noteTitle').value='';
@@ -1756,54 +1997,66 @@ document.getElementById('cancelNoteBtn').addEventListener('click', ()=>{
 document.getElementById('saveNoteBtn').addEventListener('click', async ()=>{
   const title = document.getElementById('noteTitle').value.trim() || 'Untitled';
   const body = document.getElementById('noteBody').value.trim();
-  const notes = (await storeGet('riri-notebook')) || [];
+  const notes = NOTEBOOK.slice();
   if(editingNoteId){
-    const n = notes.find(x=>x.id===editingNoteId);
-    if(n){ n.title=title; n.body=body; }
+    const idx = notes.findIndex(x=>x.id===editingNoteId);
+    if(idx>-1) notes[idx] = { ...notes[idx], title, body };
   } else {
     notes.push({id: Date.now().toString(), title, body});
   }
-  await storeSet('riri-notebook', notes);
+  await saveNotebook(notes);
   document.getElementById('editorBox').classList.remove('active');
   renderNotebook();
 });
-async function renderNotebook(){
-  const notes = (await storeGet('riri-notebook')) || [];
+function renderNotebook(){
   const grid = document.getElementById('notebookGrid');
-  if(notes.length===0){ grid.innerHTML = '<p class="empty">No sticky notes yet.</p>'; return; }
-  grid.innerHTML = notes.map(n=>`
+  if(NOTEBOOK.length===0){ grid.innerHTML = '<p class="empty">No sticky notes yet.</p>'; return; }
+  grid.innerHTML = NOTEBOOK.map(n=>`
     <div class="sticky" data-id="${n.id}">
-      <h4>${n.title.replace(/</g,'&lt;')}</h4>
-      <p>${n.body.replace(/</g,'&lt;')}</p>
-      <button class="del" data-del="${n.id}">delete</button>
+      <h4>${escapeHtml(n.title)}</h4>
+      <p>${escapeHtml(n.body)}</p>
+      ${n.comment ? `<p class="comment-note">💬 ${escapeHtml(n.comment)}</p>` : ''}
+      <div style="display:flex; gap:6px; align-self:flex-end;">
+        <button class="del admin-only" data-comment="${n.id}">💬 comment</button>
+        <button class="del riri-only" data-del="${n.id}">delete</button>
+      </div>
     </div>
   `).join('');
   grid.querySelectorAll('.sticky').forEach(card=>{
     card.addEventListener('click', (e)=>{
-      if(e.target.dataset.del) return;
+      if(e.target.dataset.del || e.target.dataset.comment) return;
+      if(isAdminView) return;
       const id = card.dataset.id;
-      storeGet('riri-notebook').then(notes=>{
-        const n = (notes||[]).find(x=>x.id===id);
-        if(!n) return;
-        editingNoteId = id;
-        document.getElementById('noteTitle').value = n.title;
-        document.getElementById('noteBody').value = n.body;
-        document.getElementById('editorBox').classList.add('active');
-      });
+      const n = NOTEBOOK.find(x=>x.id===id);
+      if(!n) return;
+      editingNoteId = id;
+      document.getElementById('noteTitle').value = n.title;
+      document.getElementById('noteBody').value = n.body;
+      document.getElementById('editorBox').classList.add('active');
     });
   });
   grid.querySelectorAll('[data-del]').forEach(btn=>{
     btn.addEventListener('click', async (e)=>{
       e.stopPropagation();
       const id = btn.dataset.del;
-      let notes = (await storeGet('riri-notebook')) || [];
-      notes = notes.filter(n=>n.id!==id);
-      await storeSet('riri-notebook', notes);
+      await saveNotebook(NOTEBOOK.filter(n=>n.id!==id));
       renderNotebook();
     });
   });
+  grid.querySelectorAll('[data-comment]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const id = btn.dataset.comment;
+      const n = NOTEBOOK.find(x=>x.id===id);
+      if(!n) return;
+      openCommentModal(n.comment, async (text)=>{
+        await saveNotebook(NOTEBOOK.map(x=> x.id===id ? {...x, comment:text} : x));
+        renderNotebook();
+      });
+    });
+  });
 }
-renderNotebook();
+loadNotebook();
 
 /* ---------------- QUIZ ---------------- */
 const quizBank = [
