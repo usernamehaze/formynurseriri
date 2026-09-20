@@ -887,7 +887,9 @@ window.__fmrReady = Promise.race([
             <input type="text" id="newFront" placeholder="Front (term / question)">
           </div>
           <div class="form-row">
-            <input type="text" id="newBack" placeholder="Back (definition / answer)">
+            <textarea id="newBack" rows="5" placeholder="Back (definition / answer) — type or paste from your notes"></textarea>
+          </div>
+          <div class="form-row">
             <button class="btn mint" id="addCardBtn" style="flex:0 0 auto;">Add card</button>
           </div>
         </div>
