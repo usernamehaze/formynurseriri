@@ -858,13 +858,8 @@ window.__fmrReady = Promise.race([
     <section class="page" id="page-flashcards">
       <div class="card">
         <h2 class="page-title">🌷 Flashcards</h2>
-        <p class="lead">Tap a card to flip it. Rate how well you know it, filter by subject, or add your own from lecture notes.</p>
-        <div class="fc-controls" id="fcFilters">
-          <span class="chip selected" data-cat="all">All</span>
-          <span class="chip" data-cat="ELA">ELA</span>
-          <span class="chip" data-cat="Biology">Biology</span>
-          <span class="chip" data-cat="needsreview">Needs review</span>
-        </div>
+        <p class="lead">Tap a card to flip it. Rate how well you know it, filter by subject, or add your own.</p>
+        <div class="fc-controls" id="fcFilters"></div>
         <div class="fc-stage">
           <div class="flip-card" id="flipCard">
             <div class="flip-inner">
@@ -877,6 +872,7 @@ window.__fmrReady = Promise.race([
             <button class="rate-btn okay" data-rate="okay">🙂 Okay</button>
             <button class="rate-btn easy" data-rate="mastered">✅ Mastered</button>
           </div>
+          <button class="btn ghost small" id="fcDeleteBtn">🗑 Delete this card</button>
           <div class="fc-nav">
             <button class="btn ghost small" id="fcPrev">← Prev</button>
             <span class="fc-count" id="fcCount">1 / 1</span>
@@ -886,7 +882,8 @@ window.__fmrReady = Promise.race([
         <div class="add-card-form">
           <h2 class="page-title" style="font-size:17px;">➕ Add your own card</h2>
           <div class="form-row">
-            <select id="newCat"><option value="ELA">ELA</option><option value="Biology">Biology</option></select>
+            <input type="text" id="newCat" list="fcSubjectList" placeholder="Subject (e.g. Biology)">
+            <datalist id="fcSubjectList"></datalist>
             <input type="text" id="newFront" placeholder="Front (term / question)">
           </div>
           <div class="form-row">
@@ -1628,26 +1625,38 @@ document.getElementById('saveEntryBtn').addEventListener('click', async ()=>{
 renderEntries();
 
 /* ---------------- FLASHCARDS ---------------- */
-const defaultCards = [
-  {cat:'ELA', front:'Thesis statement', back:'A one/two sentence summary of the main point or argument of an essay.'},
-  {cat:'ELA', front:'Simile', back:'A comparison using "like" or "as" — e.g. "brave as a lion."'},
-  {cat:'ELA', front:'Theme', back:'The underlying message or big idea a piece of writing explores.'},
-  {cat:'ELA', front:'Inference', back:'A conclusion drawn from evidence and reasoning, not stated directly.'},
-  {cat:'Biology', front:'Homeostasis', back:"The body's process of keeping internal conditions stable and balanced."},
-  {cat:'Biology', front:'Mitochondria', back:'The organelle that produces ATP — the "powerhouse of the cell."'},
-  {cat:'Biology', front:'Osmosis', back:'Movement of water across a membrane from low to high solute concentration.'},
-  {cat:'Biology', front:'Homozygous', back:'Having two identical alleles for a given gene.'},
-];
-let fcState = { cat:'all', index:0, cards:[], ratings:{} };
+let fcState = { cat:'all', index:0, cards:[], all:[], ratings:{} };
 const rateEmoji = { hard:'😅', okay:'🙂', mastered:'✅' };
 
 function cardKey(c){ return c.cat+'|'+c.front; }
 
 async function loadFlashcards(){
-  const custom = (await storeGet('riri-flashcards-custom')) || [];
+  fcState.all = (await storeGet('riri-flashcards-custom')) || [];
   fcState.ratings = (await storeGet('riri-flashcards-ratings')) || {};
-  fcState.all = defaultCards.concat(custom);
+  renderFcFilters();
+  renderFcSubjectList();
   applyFcFilter();
+}
+function renderFcFilters(){
+  const filters = document.getElementById('fcFilters');
+  const cats = Array.from(new Set(fcState.all.map(c=>c.cat))).sort();
+  if(!cats.includes(fcState.cat) && fcState.cat!=='all' && fcState.cat!=='needsreview') fcState.cat = 'all';
+  filters.innerHTML = '<span class="chip" data-cat="all">All</span>'
+    + cats.map(cat=>`<span class="chip" data-cat="${escapeAttr(cat)}">${escapeHtml(cat)}</span>`).join('')
+    + '<span class="chip" data-cat="needsreview">Needs review</span>';
+  filters.querySelectorAll('.chip').forEach(chip=>{
+    if(chip.dataset.cat===fcState.cat) chip.classList.add('selected');
+    chip.addEventListener('click', ()=>{
+      filters.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      fcState.cat = chip.dataset.cat;
+      applyFcFilter();
+    });
+  });
+}
+function renderFcSubjectList(){
+  const cats = Array.from(new Set(fcState.all.map(c=>c.cat))).sort();
+  document.getElementById('fcSubjectList').innerHTML = cats.map(cat=>`<option value="${escapeAttr(cat)}">`).join('');
 }
 function applyFcFilter(){
   if(fcState.cat==='all') fcState.cards = fcState.all;
@@ -1661,8 +1670,9 @@ function renderFlashcard(){
   card.classList.remove('flipped');
   const c = fcState.cards[fcState.index];
   document.querySelectorAll('.rate-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('fcDeleteBtn').style.display = c ? '' : 'none';
   if(!c){
-    document.getElementById('fcFrontText').textContent = 'No cards here yet';
+    document.getElementById('fcFrontText').textContent = fcState.all.length===0 ? 'No cards yet — add your first one below!' : 'No cards here yet';
     document.getElementById('fcBackText').textContent = '';
     document.getElementById('fcCount').textContent = '0 / 0';
     document.getElementById('fcTagFront').textContent='';
@@ -1703,22 +1713,27 @@ document.querySelectorAll('.rate-btn').forEach(btn=>{
     renderFlashcard();
   });
 });
-document.querySelectorAll('#fcFilters .chip').forEach(chip=>{
-  chip.addEventListener('click', ()=>{
-    document.querySelectorAll('#fcFilters .chip').forEach(c=>c.classList.remove('selected'));
-    chip.classList.add('selected');
-    fcState.cat = chip.dataset.cat;
-    applyFcFilter();
-  });
+document.getElementById('fcDeleteBtn').addEventListener('click', async ()=>{
+  const c = fcState.cards[fcState.index];
+  if(!c) return;
+  if(!confirm('Delete this flashcard? This can\'t be undone.')) return;
+  const custom = (await storeGet('riri-flashcards-custom')) || [];
+  const idx = custom.findIndex(x=>cardKey(x)===cardKey(c));
+  if(idx>-1) custom.splice(idx,1);
+  await storeSet('riri-flashcards-custom', custom);
+  delete fcState.ratings[cardKey(c)];
+  await storeSet('riri-flashcards-ratings', fcState.ratings);
+  loadFlashcards();
 });
 document.getElementById('addCardBtn').addEventListener('click', async ()=>{
-  const cat = document.getElementById('newCat').value;
+  const cat = document.getElementById('newCat').value.trim();
   const front = document.getElementById('newFront').value.trim();
   const back = document.getElementById('newBack').value.trim();
-  if(!front || !back) return;
+  if(!cat || !front || !back) return;
   const custom = (await storeGet('riri-flashcards-custom')) || [];
   custom.push({cat, front, back});
   await storeSet('riri-flashcards-custom', custom);
+  document.getElementById('newCat').value='';
   document.getElementById('newFront').value='';
   document.getElementById('newBack').value='';
   loadFlashcards();
