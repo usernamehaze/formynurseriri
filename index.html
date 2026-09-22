@@ -320,12 +320,15 @@ window.__fmrReady = Promise.race([
     box-shadow: 0 2px 4px rgba(0,0,0,.2);
   }
   .pouch-label{ font-size:11px; font-weight:800; color:var(--ink-soft); margin:0; }
-  .pouch-grid{
-    display:grid; grid-template-columns: repeat(auto-fill,minmax(140px,1fr)); gap:14px;
-    margin-top:14px; max-height:60vh; overflow-y:auto; padding-right:4px;
+  .stack-deck{ position:relative; width:min(340px,90%); height:210px; margin:14px auto 0; }
+  .stack-layer{
+    position:absolute; inset:0; border-radius: var(--radius-lg); background: linear-gradient(160deg,#fff,#FFE9F3);
+    border:2px solid var(--pink-soft); box-shadow:0 10px 20px rgba(224,83,112,.15);
   }
-  .pouch-grid .flip-card{ width:100%; height:150px; perspective:900px; }
-  .pouch-grid .flip-face{ font-size:13.5px; padding:14px; gap:8px; flex-direction:column; }
+  .stack-layer.l3{ transform: rotate(-6deg) translateY(6px); z-index:1; opacity:.5; }
+  .stack-layer.l2{ transform: rotate(4deg) translateY(3px); z-index:2; opacity:.75; }
+  .stack-deck .flip-card{ position:absolute; inset:0; z-index:3; width:auto; height:auto; }
+  .stack-deck .flip-face{ font-size:14.5px; padding:20px; gap:10px; flex-direction:column; }
   .pouch-cat-badge{
     font-size:9.5px; font-weight:800; padding:3px 10px; border-radius:8px; letter-spacing:.02em;
     box-shadow: 0 2px 4px rgba(0,0,0,.15);
@@ -794,10 +797,30 @@ window.__fmrReady = Promise.race([
     </div>
 
     <div class="jar-modal" id="pouchModal">
-      <div class="jar-modal-inner" style="max-width:640px;">
+      <div class="jar-modal-inner">
         <button class="jar-close" id="pouchClose" aria-label="Close pouch">✕</button>
         <h3>🎀 your pouch of collected notes</h3>
-        <div class="pouch-grid" id="pouchGrid"></div>
+        <p class="empty" id="pouchEmpty" style="display:none;">No notes collected yet — pull one from the jar! 🌷</p>
+        <div id="pouchStageWrap">
+          <div class="stack-deck">
+            <div class="stack-layer l3"></div>
+            <div class="stack-layer l2"></div>
+            <div class="flip-card" id="pouchFlipCard">
+              <div class="flip-inner">
+                <div class="flip-face flip-front">
+                  <span class="pouch-cat-badge" id="pouchCatBadge"></span>
+                  <span id="pouchFrontHint"></span>
+                </div>
+                <div class="flip-face flip-back" id="pouchBackContent"></div>
+              </div>
+            </div>
+          </div>
+          <div class="fc-nav" style="margin-top:14px;">
+            <button class="btn ghost small" id="pouchPrev">← Prev</button>
+            <span class="fc-count" id="pouchStageCount">1 / 1</span>
+            <button class="btn ghost small" id="pouchNext">Next →</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1517,77 +1540,125 @@ document.getElementById('manageSaveBtn').addEventListener('click', async ()=>{
 
 /* ---------------- POUCH (collected notes) ---------------- */
 let pouchHistory = [];
+let pouchIndex = 0;
+let pouchModalOpen = false;
+
 async function loadPouchHistory(){
-  pouchHistory = (await storeGet('riri-jar-pouch')) || [];
+  const fmr = await window.__fmrReady;
+  if(!fmr){
+    pouchHistory = (await storeGet('riri-jar-pouch')) || [];
+    updatePouchCount();
+    return;
+  }
+  const ref = fmr.doc(fmr.db, 'jarData', 'pouch');
+  let stored = null;
+  try{
+    const snap = await fmr.getDoc(ref);
+    if(snap.exists()){
+      stored = snap.data().list || [];
+      if(stored.length===0){
+        const local = (await storeGet('riri-jar-pouch')) || [];
+        if(local.length>0){ stored = local; await fmr.setDoc(ref, { list: stored }); }
+      }
+    } else{
+      stored = (await storeGet('riri-jar-pouch')) || [];
+      await fmr.setDoc(ref, { list: stored });
+    }
+  }catch(e){
+    console.error('pouch load failed, using local', e);
+    stored = (await storeGet('riri-jar-pouch')) || [];
+  }
+  pouchHistory = stored;
   updatePouchCount();
+  try{
+    fmr.onSnapshot(ref, function(snap){
+      if(!snap.exists()) return;
+      pouchHistory = snap.data().list || [];
+      updatePouchCount();
+      if(pouchModalOpen) renderPouchStage();
+    });
+  }catch(e){ console.error(e); }
 }
 async function addToPouch(entry){
   pouchHistory.unshift(entry);
-  await storeSet('riri-jar-pouch', pouchHistory);
   updatePouchCount();
+  const fmr = await window.__fmrReady;
+  if(!fmr){ await storeSet('riri-jar-pouch', pouchHistory); return; }
+  const ref = fmr.doc(fmr.db, 'jarData', 'pouch');
+  try{ await fmr.setDoc(ref, { list: pouchHistory }); }
+  catch(e){ console.error('pouch save failed', e); }
 }
 function updatePouchCount(){
   const el = document.getElementById('pouchCount');
   if(pouchHistory.length>0){ el.hidden=false; el.textContent = pouchHistory.length; }
   else{ el.hidden=true; }
 }
-function renderPouchGrid(){
-  const grid = document.getElementById('pouchGrid');
+function renderPouchStage(){
+  const empty = document.getElementById('pouchEmpty');
+  const wrap = document.getElementById('pouchStageWrap');
   if(pouchHistory.length===0){
-    grid.innerHTML = '<p class="empty">No notes collected yet — pull one from the jar! 🌷</p>';
+    wrap.style.display='none';
+    empty.style.display='block';
     return;
   }
-  grid.innerHTML = pouchHistory.map(entry=>`
-    <div class="flip-card pouch-card" data-id="${escapeAttr(entry.id)}">
-      <div class="flip-inner">
-        <div class="flip-face flip-front">
-          <span class="pouch-cat-badge" style="background:${entry.color}; color:#fff;">${escapeHtml(entry.catLabel)}</span>
-          <span>${entry.type==='song' ? '♪ tap to reveal' : '💌 tap to reveal'}</span>
-        </div>
-        <div class="flip-face flip-back">
-          ${entry.type==='song'
-            ? `<div style="text-align:center;">
-                 <div style="font-weight:700;">${escapeHtml(entry.title)}</div>
-                 <div style="font-size:12px; opacity:.85; margin-bottom:10px;">${escapeHtml(entry.artist||'')}</div>
-                 <a class="song-listen-btn pouch-listen" href="#" target="_blank" rel="noopener" style="font-size:12px;">▶ Listen on Apple Music</a>
-               </div>`
-            : `<span>"${escapeHtml(entry.text)}"</span>`
-          }
-        </div>
-      </div>
-    </div>
-  `).join('');
-  grid.querySelectorAll('.pouch-card').forEach(card=>{
-    card.addEventListener('click', (e)=>{
-      if(e.target.classList.contains('pouch-listen')) return;
-      card.classList.toggle('flipped');
-      if(card.classList.contains('flipped')){
-        const entry = pouchHistory.find(x=>x.id===card.dataset.id);
-        if(entry && entry.type==='song'){
-          const link = card.querySelector('.pouch-listen');
-          if(link && link.getAttribute('href')==='#'){
-            const query = encodeURIComponent(entry.title + (entry.artist ? ' '+entry.artist : ''));
-            link.href = 'https://music.apple.com/us/search?term='+query;
-            resolveAppleMusicLink(entry.title, entry.artist).then(url=>{ if(url) link.href = url; });
-          }
-        }
-      }
-    });
-  });
+  wrap.style.display='';
+  empty.style.display='none';
+  if(pouchIndex>=pouchHistory.length) pouchIndex = 0;
+  if(pouchIndex<0) pouchIndex = pouchHistory.length-1;
+  const entry = pouchHistory[pouchIndex];
+  document.getElementById('pouchFlipCard').classList.remove('flipped');
+  const badge = document.getElementById('pouchCatBadge');
+  badge.textContent = entry.catLabel;
+  badge.style.background = entry.color;
+  document.getElementById('pouchFrontHint').textContent = entry.type==='song' ? '♪ tap to reveal' : '💌 tap to reveal';
+  const back = document.getElementById('pouchBackContent');
+  if(entry.type==='song'){
+    back.innerHTML = `<div style="text-align:center;">
+      <div style="font-weight:700;">${escapeHtml(entry.title)}</div>
+      <div style="font-size:12px; opacity:.85; margin-bottom:10px;">${escapeHtml(entry.artist||'')}</div>
+      <a class="song-listen-btn pouch-listen" href="#" target="_blank" rel="noopener" style="font-size:12px;">▶ Listen on Apple Music</a>
+      <div style="font-size:10px; opacity:.7; margin-top:8px;">${escapeHtml(entry.date||'')}</div>
+    </div>`;
+    const link = back.querySelector('.pouch-listen');
+    const query = encodeURIComponent(entry.title + (entry.artist ? ' '+entry.artist : ''));
+    link.href = 'https://music.apple.com/us/search?term='+query;
+    resolveAppleMusicLink(entry.title, entry.artist).then(url=>{ if(url) link.href = url; });
+  } else {
+    back.innerHTML = `<span>"${escapeHtml(entry.text)}"</span><div style="font-size:10px; opacity:.7; margin-top:8px;">${escapeHtml(entry.date||'')}</div>`;
+  }
+  document.getElementById('pouchStageCount').textContent = (pouchIndex+1)+' / '+pouchHistory.length;
 }
+document.getElementById('pouchFlipCard').addEventListener('click', function(e){
+  if(e.target.classList.contains('pouch-listen')) return;
+  this.classList.toggle('flipped');
+});
+document.getElementById('pouchPrev').addEventListener('click', ()=>{
+  if(pouchHistory.length===0) return;
+  pouchIndex = (pouchIndex-1+pouchHistory.length)%pouchHistory.length;
+  renderPouchStage();
+});
+document.getElementById('pouchNext').addEventListener('click', ()=>{
+  if(pouchHistory.length===0) return;
+  pouchIndex = (pouchIndex+1)%pouchHistory.length;
+  renderPouchStage();
+});
 function openPouch(){
-  renderPouchGrid();
+  pouchIndex = 0;
+  pouchModalOpen = true;
+  renderPouchStage();
   document.getElementById('pouchModal').classList.add('open');
+}
+function closePouch(){
+  pouchModalOpen = false;
+  document.getElementById('pouchModal').classList.remove('open');
 }
 document.getElementById('notesPouch').addEventListener('click', openPouch);
 document.getElementById('notesPouch').addEventListener('keydown', e=>{
   if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openPouch(); }
 });
-document.getElementById('pouchClose').addEventListener('click', ()=>{
-  document.getElementById('pouchModal').classList.remove('open');
-});
+document.getElementById('pouchClose').addEventListener('click', closePouch);
 document.getElementById('pouchModal').addEventListener('click', e=>{
-  if(e.target.id==='pouchModal') document.getElementById('pouchModal').classList.remove('open');
+  if(e.target.id==='pouchModal') closePouch();
 });
 
 (async function initJar(){
